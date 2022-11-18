@@ -11,24 +11,24 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
-from apps.core.settings import Environment
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = Environment(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.get('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.get('DEBUG')
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = env.get('ALLOWED_HOSTS')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -90,7 +90,17 @@ WSGI_APPLICATION = 'tickets.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.get('DATABASE')
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+
+        # "ENGINE": config('ENGINE'),
+        # "HOST": config('HOST'),
+        # "NAME": config('NAME'),
+        # "USER": config('USER'),
+        # "PASSWORD": config('PASSWORD'),
+        # "PORT": config('PORT'),
+    }
 }
 
 
@@ -136,6 +146,13 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Formatos de data aceitos na hora de criar ou altualizar os dados
+# https://docs.djangoproject.com/en/4.1/ref/settings/#date-input-formats
+
+DATE_FORMAT = ['%d-%m-%Y'],
+DATE_INPUT_FORMATS = ["%d-%m-%Y", "%Y-%m-%d"],
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -145,3 +162,36 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+APPEND_SLASH = False
+
+
+# Configurações do Django Rest Framework
+# https://www.django-rest-framework.org/api-guide/settings/
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissions',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    # 'DATE_FORMAT': '%d-%m-%Y',
+    # 'DATE_INPUT_FORMATS': ["%d-%m-%Y", "%Y-%m-%d"],
+}
+
+
+# Configurações do Simple JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=5),
+    'UPDATE_LAST_LOGIN': True,
+
+    'SIGNING_KEY': config('SIGNING_KEY'),
+
+    'USER_ID_FIELD': 'id',
+    'USER_AUTHENTICATION_RULE': 'apps.usuario.authentication.regra_padrao_autenticacao_usuario'
+}
