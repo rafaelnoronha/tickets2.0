@@ -45,17 +45,19 @@ DJANGO_APPS = [
 OTHER_APPS = [
     'rest_framework',
     'django_filters',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django_user_agents',
 ]
 
 MY_APPS = [
     'apps.core',
-    'apps.usuario'
+    'apps.usuario',
+    'apps.auditoria',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OTHER_APPS + MY_APPS
 
-MIDDLEWARE = [
+DJANGO_MIDDLEWARES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +66,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+OTHER_MIDDLEWARES = [
+    'django_user_agents.middleware.UserAgentMiddleware',
+]
+
+MY_MIDDLEWARES = []
+
+MIDDLEWARE = DJANGO_MIDDLEWARES + OTHER_MIDDLEWARES + MY_MIDDLEWARES
 
 ROOT_URLCONF = 'tickets.urls'
 

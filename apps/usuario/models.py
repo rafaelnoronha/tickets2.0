@@ -141,10 +141,10 @@ class PerfilUsuario(Base):
 
 
     class Meta:
-        db_table = 'tk_perfil_usuario'
+        db_table = 'tc_perfil_usuario'
+        ordering = ['-id',]
         verbose_name = 'Perfil do Usuário'
         verbose_name_plural = 'Perfis dos Usuários'
-        ordering = ['-id',]
         indexes = [
             models.Index(fields=['ps_usuario',], name='idx_ps_usuario')
         ]

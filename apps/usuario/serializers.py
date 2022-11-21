@@ -5,10 +5,20 @@ from rest_framework import exceptions
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from user_agents import parse
+
+from .models import Usuario
+from apps.auditoria.models import LogAutenticacao
 
 
 class ObterTokenSerializer(TokenObtainSerializer):
     def validate(self, attrs):
+        user_agent = parse(self.context.get('request').META.get('HTTP_USER_AGENT'))
+        print('='*100)
+        print(user_agent)
+        print(user_agent.os.family)
+        print('='*100)
+
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
             "password": attrs["password"],
@@ -20,17 +30,57 @@ class ObterTokenSerializer(TokenObtainSerializer):
 
         self.user = authenticate(**authenticate_kwargs)
 
-        # Inserir aqui o código que vai criar o log de login
-        # Caso o login falhar, self.user = None
-        # Caso o login passar, self.user = Usuario
-        # Executar o auto incremento das falhas do login
-        # Enviar e-mail caso seja a terceira vez que falhou
+        try:
+            user = Usuario.objects.get(username=attrs[self.username_field])
+
+            if not self.user and user.is_active:
+                user.authentication_failures += 1
+                user.save()
+                user.refresh_from_db()
+
+                self.user = user if user.authentication_failures >= 3 else None
+
+        except Usuario.DoesNotExist:
+            user = None
 
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
-            raise exceptions.AuthenticationFailed(
-                self.error_messages["no_active_account"],
-                "no_active_account",
+            # Criar log de autenticação
+            if user:
+                LogAutenticacao.objects.create(
+                    lt_ip=self.context.get('request').META.get('REMOTE_ADDR'),
+                    lt_user_agent=self.context.get('request').META.get('HTTP_USER_AGENT'),
+                    lt_usuario=user,
+                    lt_autenticado='N',
+                )
+
+            if user and not user.is_active:
+                raise exceptions.AuthenticationFailed(
+                    'Nenhuma conta ativa encontrada com as credenciais fornecidas',
+                    "usuario_inativo",
+                )
+            elif self.user and self.user.authentication_failures >= 3:
+                raise exceptions.AuthenticationFailed(
+                    'Usuário bloqueado, máximo de tentativas falhas de login atingido',
+                    "usuario_bloqueado",
+                )
+            else:
+                raise exceptions.AuthenticationFailed(
+                    self.error_messages["no_active_account"],
+                    "no_active_account",
+                )
+        else:
+            # Criar log de autenticação
+            LogAutenticacao.objects.create(
+                lt_ip=self.context.get('request').META.get('REMOTE_ADDR'),
+                lt_user_agent=self.context.get('request').META.get('HTTP_USER_AGENT'),
+                lt_usuario=user,
+                lt_autenticado='S',
             )
+
+            if user and user.authentication_failures != 0:
+                user.authentication_failures = 0
+                user.save()
+
 
         return {}
 
