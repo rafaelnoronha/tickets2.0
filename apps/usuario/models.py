@@ -56,6 +56,9 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
+    NUM_FAIL_AUTH_FIELD = 'authentication_failures'
+    MAX_NUM_FAIL_AUTH = 5
+
     objects = UserManagerCustom()
 
 

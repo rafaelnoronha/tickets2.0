@@ -16,7 +16,7 @@ class LogAutenticacao(Base):
 
     lt_user_agent = models.CharField(
         verbose_name='User Agent',
-        max_length=100,
+        max_length=200,
         help_text='Descrição do dispositivo que está autenticando',
     )
 
@@ -33,18 +33,6 @@ class LogAutenticacao(Base):
         max_length=1,
         choices=SIM_NAO_CHOICE,
         help_text='Se a tentativa de autenticação foi bem-sucedida ou não',
-    )
-
-    lt_data_autenticacao = models.DateField(
-        verbose_name='Data da autenticação',
-        auto_now_add=True,
-        help_text='Data da tentativa de autenticação',
-    )
-
-    lt_hora_autenticacao = models.TimeField(
-        verbose_name='Hora da autenticação',
-        auto_now_add=True,
-        help_text='Hora da tentativa de autenticação',
     )
 
     ativo = None

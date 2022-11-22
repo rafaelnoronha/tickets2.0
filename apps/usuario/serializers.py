@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import update_last_login
 
 from rest_framework import exceptions
@@ -13,11 +13,10 @@ from apps.auditoria.models import LogAutenticacao
 
 class ObterTokenSerializer(TokenObtainSerializer):
     def validate(self, attrs):
+        user_model = get_user_model()
+        max_num_fail_auth = user_model.MAX_NUM_FAIL_AUTH
+        num_fail_auth_field = user_model.NUM_FAIL_AUTH_FIELD
         user_agent = parse(self.context.get('request').META.get('HTTP_USER_AGENT'))
-        print('='*100)
-        print(user_agent)
-        print(user_agent.os.family)
-        print('='*100)
 
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
@@ -31,24 +30,23 @@ class ObterTokenSerializer(TokenObtainSerializer):
         self.user = authenticate(**authenticate_kwargs)
 
         try:
-            user = Usuario.objects.get(username=attrs[self.username_field])
+            user = user_model.objects.get(username=attrs[self.username_field])
 
             if not self.user and user.is_active:
-                user.authentication_failures += 1
+                user.__setattr__(num_fail_auth_field, user.__getattribute__(num_fail_auth_field) + 1)
                 user.save()
                 user.refresh_from_db()
 
-                self.user = user if user.authentication_failures >= 3 else None
+                self.user = user if user.__getattribute__(num_fail_auth_field) >= max_num_fail_auth else None
 
         except Usuario.DoesNotExist:
             user = None
 
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
-            # Criar log de autenticação
             if user:
                 LogAutenticacao.objects.create(
                     lt_ip=self.context.get('request').META.get('REMOTE_ADDR'),
-                    lt_user_agent=self.context.get('request').META.get('HTTP_USER_AGENT'),
+                    lt_user_agent=user_agent,
                     lt_usuario=user,
                     lt_autenticado='N',
                 )
@@ -58,7 +56,7 @@ class ObterTokenSerializer(TokenObtainSerializer):
                     'Nenhuma conta ativa encontrada com as credenciais fornecidas',
                     "usuario_inativo",
                 )
-            elif self.user and self.user.authentication_failures >= 3:
+            elif self.user and self.user.__getattribute__(num_fail_auth_field) >= max_num_fail_auth:
                 raise exceptions.AuthenticationFailed(
                     'Usuário bloqueado, máximo de tentativas falhas de login atingido',
                     "usuario_bloqueado",
@@ -69,16 +67,15 @@ class ObterTokenSerializer(TokenObtainSerializer):
                     "no_active_account",
                 )
         else:
-            # Criar log de autenticação
             LogAutenticacao.objects.create(
                 lt_ip=self.context.get('request').META.get('REMOTE_ADDR'),
-                lt_user_agent=self.context.get('request').META.get('HTTP_USER_AGENT'),
+                lt_user_agent=user_agent,
                 lt_usuario=user,
                 lt_autenticado='S',
             )
 
-            if user and user.authentication_failures != 0:
-                user.authentication_failures = 0
+            if user and user.__getattribute__(num_fail_auth_field) != 0:
+                user.__setattr__(num_fail_auth_field, 0)
                 user.save()
 
 
