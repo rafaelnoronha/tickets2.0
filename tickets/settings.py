@@ -53,6 +53,7 @@ MY_APPS = [
     'apps.core',
     'apps.usuario',
     'apps.auditoria',
+    'apps.empresa',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OTHER_APPS + MY_APPS

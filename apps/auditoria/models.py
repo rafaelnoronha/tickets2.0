@@ -6,7 +6,7 @@ from apps.usuario.models import Usuario
 
 class LogAutenticacao(Base):
     """
-    Modelo que vai guardar as tentativas de login, tanto as que tiveram sucesso quanto as que falharem.
+    Modelo que armazena as tentativas de login, tanto as que tiveram sucesso quanto as que falharem.
     """
 
     lt_ip = models.GenericIPAddressField(
@@ -36,6 +36,7 @@ class LogAutenticacao(Base):
     )
 
     ativo = None
+    empresa = None
 
 
     class Meta:

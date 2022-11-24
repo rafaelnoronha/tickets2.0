@@ -21,6 +21,10 @@ class UserManagerCustom(UserManager):
 
 
 class Usuario(Base, AbstractBaseUser, PermissionsMixin):
+    """
+    Modelo que armazena os dados de autenticação dos usuários(clientes e prestadores de serviço).
+    """
+
     username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
@@ -53,6 +57,7 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
     )
 
     ativo = None
+    empresa = None
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
@@ -77,6 +82,10 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
 
 
 class PerfilUsuario(Base):
+    """
+    Modelo que armazena os dados "adicionais" dos usuários(clientes e prestadores de serviço).
+    """
+
     ps_usuario = models.OneToOneField(
         Usuario,
         verbose_name='Usuário',
