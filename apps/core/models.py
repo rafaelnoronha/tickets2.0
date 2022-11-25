@@ -53,6 +53,15 @@ class Base(models.Model):
         help_text='Se o registro está ativo ou não'
     )
 
+    empresa = models.OneToOneField(
+        'Empresa',
+        verbose_name='Empresa',
+        on_delete=models.PROTECT,
+        related_name='rl_bs_empresa',
+        null=True,
+        help_text='Para qual empresa o parâmetro será usado',
+    )
+
     data_criacao = models.DateField(
         verbose_name='Data de Criação',
         auto_now_add=True,
@@ -65,12 +74,11 @@ class Base(models.Model):
         help_text='Hora da criação do registro'
     )
 
-    empresa = models.OneToOneField(
-        'Empresa',
-        verbose_name='Empresa',
-        on_delete=models.CASCADE,
-        related_name='rl_pr_empresa',
-        null=True,
+    owner_id = models.OneToOneField(
+        'Usuario',
+        verbose_name='Owner Id',
+        on_delete=models.PROTECT,
+        related_name='rl_bs_owner_id',
         help_text='Para qual empresa o parâmetro será usado',
     )
 
@@ -102,16 +110,14 @@ class Parametro(Base):
         help_text='Descrição do parâmetro',
     )
 
-    pr_empresa = models.OneToOneField(
-        Empresa,
-        verbose_name='Empresa',
-        on_delete=models.CASCADE,
-        related_name='rl_pr_empresa',
-        null=True,
-        help_text='Para qual empresa o parâmetro será usado',
-    )
-    
-    empresa = None
+    # pr_empresa = models.OneToOneField(
+    #     Empresa,
+    #     verbose_name='Empresa',
+    #     on_delete=models.CASCADE,
+    #     related_name='rl_pr_empresa',
+    #     null=True,
+    #     help_text='Para qual empresa o parâmetro será usado',
+    # )
     
 
     class Meta:
@@ -121,10 +127,11 @@ class Parametro(Base):
         ordering = ['-id',]
         indexes = [
             models.Index(fields=['pr_codigo',], name='idx_pr_codigo'),
-            models.Index(fields=['pr_empresa',], name='idx_pr_empresa'),
+            models.Index(fields=['empresa',], name='idx_pr_empresa'),
+            models.Index(fields=['owner_id',], name='idx_bs_owner_id'),
         ]
         unique_together = [
-            ['pr_codigo', 'pr_empresa'],
+            ['pr_codigo', 'empresa'],
         ]
 
     """
