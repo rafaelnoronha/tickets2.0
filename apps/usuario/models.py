@@ -158,7 +158,8 @@ class PerfilUsuario(Base):
         verbose_name = 'Perfil do Usuário'
         verbose_name_plural = 'Perfis dos Usuários'
         indexes = [
-            models.Index(fields=['ps_usuario',], name='idx_ps_usuario')
+            models.Index(fields=['ps_usuario',], name='idx_ps_usuario'),
+            models.Index(fields=['empresa',], name='idx_ps_empresa'),
         ]
         permissions = (
             ('transformar_em_gerente', 'Concede privilégios de um gerente ao usuário'),

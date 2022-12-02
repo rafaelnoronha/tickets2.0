@@ -362,11 +362,14 @@ class Empresa(Base):
 
     mp_prestadora_servico = models.CharField(
         verbose_name='Prestadora Serviço',
+        max_length=1,
         choices=SIM_NAO_CHOICE,
         help_text='Se a empresa é a prestadora dos serviços ou não',
     )
 
     empresa = None
+    owner_id = None
+
 
     class Meta:
         db_table = 'tc_empresa'

@@ -1,7 +1,5 @@
 from django.db import models
 
-from apps.empresa.models import Empresa
-
 
 SIM_NAO_CHOICE = (
     ('S', 'Sim'),
@@ -54,10 +52,9 @@ class Base(models.Model):
     )
 
     empresa = models.OneToOneField(
-        'Empresa',
+        'empresa.Empresa',
         verbose_name='Empresa',
         on_delete=models.PROTECT,
-        related_name='rl_bs_empresa',
         null=True,
         help_text='Para qual empresa o parâmetro será usado',
     )
@@ -74,11 +71,23 @@ class Base(models.Model):
         help_text='Hora da criação do registro'
     )
 
+    data_alteracao = models.DateField(
+        verbose_name='Data da Alteração',
+        auto_now=True,
+        help_text='Data da alteração do registro'
+    )
+
+    hora_alteracao = models.TimeField(
+        verbose_name='Hora da Alteração',
+        auto_now=True,
+        help_text='Hora da alteração do registro'
+    )
+
     owner_id = models.OneToOneField(
-        'Usuario',
+        'usuario.Usuario',
         verbose_name='Owner Id',
         on_delete=models.PROTECT,
-        related_name='rl_bs_owner_id',
+        null=True,
         help_text='Para qual empresa o parâmetro será usado',
     )
 

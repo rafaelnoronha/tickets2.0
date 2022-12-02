@@ -1,11 +1,13 @@
+import uuid
+import re
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import update_last_login
-
-from rest_framework import exceptions
-from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from user_agents import parse
+
+from rest_framework import exceptions, serializers
+from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.serializers import TokenObtainSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Usuario
 from apps.auditoria.models import LogAutenticacao
@@ -17,6 +19,9 @@ class ObterTokenSerializer(TokenObtainSerializer):
         max_num_fail_auth = user_model.MAX_NUM_FAIL_AUTH
         num_fail_auth_field = user_model.NUM_FAIL_AUTH_FIELD
         user_agent = parse(self.context.get('request').META.get('HTTP_USER_AGENT'))
+
+        print(uuid.getnode())
+        print (':'.join(re.findall('..', '%012x' % uuid.getnode() )))
 
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
@@ -83,17 +88,46 @@ class ObterTokenSerializer(TokenObtainSerializer):
 
 
 class ObterParTokensSerializer(ObterTokenSerializer):
-    token_class = RefreshToken
+    @classmethod
+    def get_token(cls, user):
+        return RefreshToken.for_user(user)
 
     def validate(self, attrs):
         data = super().validate(attrs)
 
         refresh = self.get_token(self.user)
 
-        data["refresh"] = str(refresh)
-        data["access"] = str(refresh.access_token)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
 
         if api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, self.user)
+
+        return data
+
+
+class AtualizacaoTokenSerializer(TokenRefreshSerializer):
+    refresh = serializers.CharField()
+    access = serializers.ReadOnlyField()
+
+    def validate(self, attrs):
+        refresh = RefreshToken(attrs['refresh'])
+
+        data = {'access': str(refresh.access_token)}
+
+        if api_settings.ROTATE_REFRESH_TOKENS:
+            if api_settings.BLACKLIST_AFTER_ROTATION:
+                try:
+                    # Attempt to blacklist the given refresh token
+                    refresh.blacklist()
+                except AttributeError:
+                    # If blacklist app not installed, `blacklist` method will
+                    # not be present
+                    pass
+
+            refresh.set_jti()
+            refresh.set_exp()
+
+            data['refresh'] = str(refresh)
 
         return data

@@ -7,7 +7,7 @@ def regra_padrao_autenticacao_usuario(user):
 
     usuario_autenticado = user is not None and user.is_active and user.__getattribute__(num_fail_auth_field) < max_num_fail_auth
 
-    if user and user.__getattribute__(num_fail_auth_field) == 3:
+    if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth:
         # Enviar email
         pass
 

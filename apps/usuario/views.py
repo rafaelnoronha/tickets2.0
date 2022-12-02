@@ -1,4 +1,6 @@
 from rest_framework_simplejwt.views import TokenViewBase
+from apps.usuario.serializers import ObterParTokensSerializer, AtualizacaoTokenSerializer
+
 
 class ObterParTokensView(TokenViewBase):
     """
@@ -6,6 +8,4 @@ class ObterParTokensView(TokenViewBase):
     token pair to prove the authentication of those credentials.
     """
 
-    _serializer_class = 'apps.usuario.serializers.ObterParTokensSerializer'
-
-
+    serializer_class = ObterParTokensSerializer
