@@ -1,5 +1,3 @@
-import uuid
-import re
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import update_last_login
 from user_agents import parse
@@ -13,15 +11,17 @@ from .models import Usuario
 from apps.auditoria.models import LogAutenticacao
 
 
+class UsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+
+
 class ObterTokenSerializer(TokenObtainSerializer):
     def validate(self, attrs):
         user_model = get_user_model()
         max_num_fail_auth = user_model.MAX_NUM_FAIL_AUTH
         num_fail_auth_field = user_model.NUM_FAIL_AUTH_FIELD
         user_agent = parse(self.context.get('request').META.get('HTTP_USER_AGENT'))
-
-        print(uuid.getnode())
-        print (':'.join(re.findall('..', '%012x' % uuid.getnode() )))
 
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
@@ -90,7 +90,10 @@ class ObterTokenSerializer(TokenObtainSerializer):
 class ObterParTokensSerializer(ObterTokenSerializer):
     @classmethod
     def get_token(cls, user):
-        return RefreshToken.for_user(user)
+        token = RefreshToken.for_user(user)
+        token['teste'] = 123
+
+        return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
