@@ -13,6 +13,7 @@ from apps.auditoria.models import LogAutenticacao
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
+        model = Usuario
         fields = '__all__'
 
 

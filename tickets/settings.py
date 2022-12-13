@@ -186,7 +186,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissions',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.usuario.authentication.JWTAuthenticationCustom',
     ],
     # 'DATE_FORMAT': '%d-%m-%Y',
     # 'DATE_INPUT_FORMATS': ["%d-%m-%Y", "%Y-%m-%d"],
@@ -204,5 +205,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': config('SIGNING_KEY'),
 
     'USER_ID_FIELD': 'id',
-    'USER_AUTHENTICATION_RULE': 'apps.usuario.authentication.regra_padrao_autenticacao_usuario'
+    'USER_AUTHENTICATION_RULE': 'apps.usuario.authentication.regra_padrao_autenticacao_usuario',
+
+    # 'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken', 'apps.usuario.tokens.ValidarTokenAcesso',),
 }
