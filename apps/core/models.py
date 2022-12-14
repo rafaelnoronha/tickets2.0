@@ -118,15 +118,6 @@ class Parametro(Base):
         max_length=4000,
         help_text='Descrição do parâmetro',
     )
-
-    # pr_empresa = models.OneToOneField(
-    #     Empresa,
-    #     verbose_name='Empresa',
-    #     on_delete=models.CASCADE,
-    #     related_name='rl_pr_empresa',
-    #     null=True,
-    #     help_text='Para qual empresa o parâmetro será usado',
-    # )
     
 
     class Meta:
@@ -142,12 +133,3 @@ class Parametro(Base):
         unique_together = [
             ['pr_codigo', 'empresa'],
         ]
-
-    """
-    EMAIL_HOST
-    EMAIL_HOST_USER
-    EMAIL_HOST_PASSWORD
-    EMAIL_PORT
-    EMAIL_USE_TLS
-    EMAIL_USE_SSL
-    """
