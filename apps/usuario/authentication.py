@@ -2,9 +2,11 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import Token
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+from apps.empresa.models import Empresa
+from apps.core.email import Email
 
 
 def regra_padrao_autenticacao_usuario(user):
@@ -14,8 +16,8 @@ def regra_padrao_autenticacao_usuario(user):
     usuario_autenticado = user is not None and user.is_active and user.__getattribute__(num_fail_auth_field) < max_num_fail_auth
 
     if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth:
-        # Enviar email
-        pass
+        email = Email(Empresa())
+        email.enviar()
 
     return usuario_autenticado
 
