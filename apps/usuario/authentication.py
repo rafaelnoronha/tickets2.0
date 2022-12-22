@@ -15,9 +15,13 @@ def regra_padrao_autenticacao_usuario(user):
 
     usuario_autenticado = user is not None and user.is_active and user.__getattribute__(num_fail_auth_field) < max_num_fail_auth
 
-    if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth:
+    if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth or True:
         email = Email(Empresa())
-        email.enviar()
+        email.enviar(
+            destinatario=['rafaelsnoronhag@gmail.com',],
+            assunto='Teste Envio de e-mail',
+            corpo='123'
+        )
 
     return usuario_autenticado
 
