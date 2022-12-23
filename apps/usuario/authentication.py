@@ -18,9 +18,11 @@ def regra_padrao_autenticacao_usuario(user):
     if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth or True:
         email = Email(Empresa())
         email.enviar(
-            destinatario=['rafaelsnoronhag@gmail.com',],
-            assunto='Teste Envio de e-mail',
-            corpo='123'
+            destinatario=['fasimo4605@irebah.com',],
+            assunto='Teste Envio de e-mail 1',
+            corpo="""
+                <h1 style="color: red;">123</h1>
+            """
         )
 
     return usuario_autenticado

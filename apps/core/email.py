@@ -1,5 +1,7 @@
 from django.core import mail
+from django.core.mail import EmailMessage
 from django.db.models import Q
+from datetime import date
 
 from .models import Parametro
 
@@ -31,7 +33,7 @@ class Email:
             use_ssl=True if self.use_ssl == 'S' else False,
         )
 
-        email = mail.EmailMessage(
+        email = EmailMessage(
             connection=connection,
             from_email=self.username,
             to=destinatario,
@@ -40,10 +42,8 @@ class Email:
             cc=copia,
             bcc=copia_oculta,
             reply_to=[self.username,],
-            headers={
-
-            },
         )
+        email.content_subtype = 'html'
         email.send()
 
         # https://stackoverflow.com/questions/36351318/django-email-message-as-html
