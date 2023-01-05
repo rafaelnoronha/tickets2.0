@@ -9,12 +9,60 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Usuario
 from apps.auditoria.models import LogAutenticacao
+from apps.core.utils import rn_remove_itens
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = '__all__'
+        fields = [
+            'id',
+            'username',
+            'password',
+            'email',
+            'is_active',
+            'is_superuser',
+            'authentication_failures',
+            'last_login',
+            'data_criacao',
+            'hora_criacao',
+            'data_alteracao',
+            'hora_alteracao',
+            'owner_id'
+        ]
+        read_only_fields = fields.copy()
+
+
+class UsuarioListSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        fields_to_remove = [
+            'password',
+            'authentication_failures',
+            'data_criacao',
+            'hora_criacao',
+            'data_alteracao',
+            'hora_alteracao',
+            'hora_alteracao',
+            'owner_id'
+        ]
+        fields = rn_remove_itens(UsuarioSerializer.Meta.fields.copy(), fields_to_remove)
+
+
+class UsuarioPutPathSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        fields_to_remove = ['email',]
+        read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
+
+
+class UsuarioPostSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        fields_to_remove = [
+            'username',
+            'password',
+            'email',
+            'owner_id'
+        ]
+        read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
 
 
 class ObterTokenSerializer(TokenObtainSerializer):

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.template.loader import render_to_string
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.settings import api_settings
@@ -15,14 +16,13 @@ def regra_padrao_autenticacao_usuario(user):
 
     usuario_autenticado = user is not None and user.is_active and user.__getattribute__(num_fail_auth_field) < max_num_fail_auth
 
-    if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth or True:
+    if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth:
+        html_email = render_to_string('email_conta_bloqueada.html', {'usuario': user})
         email = Email(Empresa())
         email.enviar(
-            destinatario=['fasimo4605@irebah.com',],
-            assunto='Teste Envio de e-mail 1',
-            corpo="""
-                <h1 style="color: red;">123</h1>
-            """
+            destinatario=[user.email,],
+            assunto='Sua conta foi bloqueada',
+            corpo=html_email
         )
 
     return usuario_autenticado
@@ -38,8 +38,8 @@ class JWTAuthenticationCustom(JWTAuthentication):
         for AuthToken in api_settings.AUTH_TOKEN_CLASSES:
             try:
                 auth_token = AuthToken(raw_token)
-                if auth_token.__getitem__('teste') == 123:
-                    raise TokenError('Token Inválido')
+                # if auth_token.__getitem__('teste') == 123:
+                #     raise TokenError('Token Inválido')
 
                 return auth_token
             except TokenError as e:

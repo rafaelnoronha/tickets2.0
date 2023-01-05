@@ -25,5 +25,5 @@ api_v1 = 'api/v1'
 urlpatterns = [
     path(f"{api_v1}/token/", ObterParTokensView.as_view(), name='token_obtain_pair'),
     path(f"{api_v1}/refresh/", TokenRefreshView.as_view(), name='token_refresh'),
-    path(f"{api_v1}/usuarios/", include(usuario_router.urls), name='token_refresh'),
+    path(f"{api_v1}/usuario/", include(usuario_router.urls)),
 ]

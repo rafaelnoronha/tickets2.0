@@ -45,5 +45,3 @@ class Email:
         )
         email.content_subtype = 'html'
         email.send()
-
-        # https://stackoverflow.com/questions/36351318/django-email-message-as-html
