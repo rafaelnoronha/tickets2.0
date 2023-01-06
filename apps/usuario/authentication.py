@@ -1,13 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from django.template.loader import render_to_string
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
-from apps.empresa.models import Empresa
-from apps.core.email import Email
+from apps.core.email import EmailHTML
 
 
 def regra_padrao_autenticacao_usuario(user):
@@ -17,12 +15,14 @@ def regra_padrao_autenticacao_usuario(user):
     usuario_autenticado = user is not None and user.is_active and user.__getattribute__(num_fail_auth_field) < max_num_fail_auth
 
     if user and user.__getattribute__(num_fail_auth_field) == max_num_fail_auth:
-        html_email = render_to_string('email_conta_bloqueada.html', {'usuario': user})
-        email = Email(Empresa())
+        email = EmailHTML()
         email.enviar(
             destinatario=[user.email,],
             assunto='Sua conta foi bloqueada',
-            corpo=html_email
+            corpo={
+                'template': 'email_conta_bloqueada.html',
+                'dados': {'usuario': user}
+            }
         )
 
     return usuario_autenticado

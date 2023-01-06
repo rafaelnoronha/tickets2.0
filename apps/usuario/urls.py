@@ -5,5 +5,3 @@ from .views import UsuarioViewSet
 
 usuario_router = SimpleRouter()
 usuario_router.register(r'', UsuarioViewSet)
-
-print(usuario_router.urls)

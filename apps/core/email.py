@@ -1,13 +1,14 @@
 from django.core import mail
 from django.core.mail import EmailMessage
 from django.db.models import Q
-from datetime import date
+from django.template.loader import render_to_string
 
 from .models import Parametro
+from apps.empresa.models import Empresa
 
 
-class Email:
-    def __init__(self, empresa):
+class EmailHTML:
+    def __init__(self, empresa=Empresa(),):
         self.host = self.__get_parametro__(empresa, 'EMAIL_HOST').pr_valor
         self.port = self.__get_parametro__(empresa, 'EMAIL_PORT').pr_valor
         self.username = self.__get_parametro__(empresa, 'EMAIL_HOST_USER').pr_valor
@@ -24,6 +25,8 @@ class Email:
         )
 
     def enviar(self, destinatario, assunto, corpo, copia=None, copia_oculta=None):
+        html_email = render_to_string(corpo.get('template'), corpo.get('dados'))
+
         connection = mail.get_connection(
             host=self.host,
             port=self.port,
@@ -38,7 +41,7 @@ class Email:
             from_email=self.username,
             to=destinatario,
             subject=assunto,
-            body=corpo,
+            body=html_email,
             cc=copia,
             bcc=copia_oculta,
             reply_to=[self.username,],

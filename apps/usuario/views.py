@@ -1,8 +1,14 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from decouple import config
+from datetime import datetime, timezone, timedelta
+import jwt
+import uuid
 
 from .models import Usuario
 from .serializers import (
@@ -10,6 +16,7 @@ from .serializers import (
     UsuarioPostSerializer, ObterParTokensSerializer
 )
 from apps.core.views import BaseModelViewSet
+from apps.core.email import EmailHTML
 
 
 class UsuarioViewSet(BaseModelViewSet):
@@ -31,13 +38,37 @@ class UsuarioViewSet(BaseModelViewSet):
         url_name='esqueci-minha-senha',
     )
     def esqueci_minha_senha(self, request, email_usuario):
-        return Response(f'E-mail enviado para { email_usuario }!', status=status.HTTP_200_OK)
+        usuario = get_object_or_404(Usuario, email=email_usuario)
+
+        jwt_redefinir_senha = jwt.encode(
+            {
+                'token_type': 'password-reset',
+                'iat': datetime.now(tz=timezone.utc),
+                'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=15),
+                'jti': str(uuid.uuid4()),
+                'user_email': usuario.email,
+            },
+            config('SECRET_KEY'),
+            algorithm='HS256'
+        )
+
+        email = EmailHTML()
+        email.enviar(
+            destinatario=[usuario.email,],
+            assunto='Recuperação de Senha',
+            corpo={
+                'template': 'email_recuperacao_senha.html',
+                'dados': {'usuario': usuario, 'jwt': jwt_redefinir_senha}
+            }
+        )
+
+        return Response({ 'token': jwt_redefinir_senha }, status=status.HTTP_200_OK)
 
     @action(
         methods=['patch'],
         detail=True,
         permission_classes=[AllowAny,],
-        url_path=r'redefinir-senha/(?P<jwt>(\w+\.){2}\w+)',
+        url_path=r'redefinir-senha/(?P<jwt>(\w+\.\-){2}\w+)',
         url_name='redefinir-senha',
     )
     def redefinir_senha(self, request, pk, jwt):
