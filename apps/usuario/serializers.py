@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.password_validation import validate_password
 from user_agents import parse
 
 from rest_framework import exceptions, serializers
@@ -18,7 +20,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'username',
-            'password',
             'email',
             'is_active',
             'is_superuser',
@@ -36,7 +37,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class UsuarioListSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
         fields_to_remove = [
-            'password',
             'authentication_failures',
             'data_criacao',
             'hora_criacao',
@@ -63,6 +63,72 @@ class UsuarioPostSerializer(UsuarioSerializer):
             'owner_id'
         ]
         read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
+
+
+class UsuarioRedefinirSenhaSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128, required=True)
+    password_confirmation = serializers.CharField(max_length=128, required=True)
+
+    def validate_password(self, password):
+        validate_password(password)
+
+        return password
+
+    def validate_password_confirmation(self, password_confirmation):
+        validate_password(password_confirmation)
+
+        return password_confirmation
+
+    def validate(self, attrs):
+        data = self.get_initial()
+
+        if data.get('password') != data.get('password_confirmation'):
+            raise serializers.ValidationError("O password e o password_confirmation devem ser iguais.")
+
+        return attrs
+
+    class Meta:
+        fields = [
+            'password',
+            'password_confirmation'
+        ]
+
+
+class UsuarioAlterarSenhaSerializer(serializers.Serializer):
+    current_password = serializers.CharField(max_length=128, required=True)
+    new_password = serializers.CharField(max_length=128, required=True)
+    new_password_confirmation = serializers.CharField(max_length=128, required=True)
+
+    def validate_current_password(self, current_password):
+        if not check_password(current_password, self.get_initial().get('new_password')):
+            raise serializers.ValidationError('O current_password é inválido.')
+
+        return current_password
+
+    def validate_new_password(self, password):
+        validate_password(password)
+
+        return password
+
+    def validate_new_password_confirmation(self, password_confirmation):
+        validate_password(password_confirmation)
+
+        return password_confirmation
+
+    def validate(self, attrs):
+        data = self.get_initial()
+
+        if data.get('new_password') != data.get('new_password_confirmation'):
+            raise serializers.ValidationError("O new_password e o new_password_confirmation devem ser iguais.")
+
+        return attrs
+
+    class Meta:
+        fields = [
+            'current_password',
+            'new_password',
+            'new_password_confirmation'
+        ]
 
 
 class ObterTokenSerializer(TokenObtainSerializer):
@@ -140,7 +206,7 @@ class ObterParTokensSerializer(ObterTokenSerializer):
     @classmethod
     def get_token(cls, user):
         token = RefreshToken.for_user(user)
-        token['teste'] = 123
+        # token['teste'] = 123
 
         return token
 

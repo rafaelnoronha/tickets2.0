@@ -50,6 +50,13 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         help_text='Número de falhas de autenticação',
     )
 
+    uuid_password_reset = models.CharField(
+        verbose_name='UUID Password Reset',
+        max_length=36,
+        blank=True,
+        help_text='UUID da última solicitação de redefinição de senha'
+    )
+
     is_active = models.BooleanField(
         verbose_name='Is active',
         default=True,
