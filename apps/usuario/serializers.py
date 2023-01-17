@@ -65,6 +65,12 @@ class UsuarioPostSerializer(UsuarioSerializer):
         read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
 
 
+class UsuarioAtivarInativarSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        fields = ['is_active',]
+        read_only_fields = []
+
+
 class UsuarioRedefinirSenhaSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, required=True)
     password_confirmation = serializers.CharField(max_length=128, required=True)
@@ -98,12 +104,6 @@ class UsuarioAlterarSenhaSerializer(serializers.Serializer):
     current_password = serializers.CharField(max_length=128, required=True)
     new_password = serializers.CharField(max_length=128, required=True)
     new_password_confirmation = serializers.CharField(max_length=128, required=True)
-
-    def validate_current_password(self, current_password):
-        if not check_password(current_password, self.get_initial().get('new_password')):
-            raise serializers.ValidationError('O current_password é inválido.')
-
-        return current_password
 
     def validate_new_password(self, password):
         validate_password(password)

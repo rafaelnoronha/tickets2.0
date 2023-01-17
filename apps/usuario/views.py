@@ -1,10 +1,13 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework import exceptions
 from decouple import config
 from datetime import datetime, timezone, timedelta
 from jwt import encode as jwt_encode, decode as jwt_decode
@@ -15,7 +18,7 @@ from .models import Usuario
 from .serializers import (
     UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
     UsuarioPostSerializer, ObterParTokensSerializer, UsuarioRedefinirSenhaSerializer,
-    UsuarioAlterarSenhaSerializer
+    UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer
 )
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
@@ -36,8 +39,8 @@ class UsuarioViewSet(BaseModelViewSet):
         methods=['get'],
         detail=False,
         permission_classes=[AllowAny,],
-        url_path=r'(?P<email_usuario>\w+@[a-z]+(\.[a-z]+)+)/esqueci-minha-senha',
-        url_name='esqueci-minha-senha',
+        url_path=r'(?P<email_usuario>\w+@[a-z]+(\.[a-z]+)+)/solicitar-redefinicao-senha',
+        url_name='solicitar-redefinicao-senha',
     )
     def esqueci_minha_senha(self, request, email_usuario):
         usuario = get_object_or_404(Usuario, email=email_usuario)
@@ -114,10 +117,21 @@ class UsuarioViewSet(BaseModelViewSet):
         url_name='alterar-senha',
     )
     def alterar_password(self, request, pk):
+        usuario = self.get_object()
         serializer = UsuarioAlterarSenhaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        return Response(f'Usuário { pk } bloqueado/desbloqueado!', status=status.HTTP_200_OK)
+        usuario = authenticate(username=usuario.username, password=serializer.data.get('current_password'))
+
+        if usuario is None:
+            raise exceptions.AuthenticationFailed(_('Invalid username/password.'))
+
+        usuario.set_password(serializer.data.get('new_password'))
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         methods=['patch'],
@@ -126,7 +140,13 @@ class UsuarioViewSet(BaseModelViewSet):
         url_name='desbloquear',
     )
     def desbloquear(self, request, pk):
-        return Response(f'Usuário { pk } bloqueado/desbloqueado!', status=status.HTTP_200_OK)
+        usuario = self.get_object()
+        usuario.authentication_failures = 0
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         methods=['patch'],
@@ -135,7 +155,17 @@ class UsuarioViewSet(BaseModelViewSet):
         url_name='ativar-inativar',
     )
     def ativa_invativar(self, request, pk):
-        return Response(f'Usuário { pk } ativado/inativado!', status=status.HTTP_200_OK)
+        usuario = self.get_object()
+
+        serializer = UsuarioAtivarInativarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        usuario.is_active = serializer.data.get( 'is_active' )
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ObterParTokensView(TokenViewBase):
