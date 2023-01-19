@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from user_agents import parse
 
@@ -15,6 +15,11 @@ from apps.core.utils import rn_remove_itens
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    def validate_password(self, password):
+        validate_password(password)
+
+        return make_password(password)
+
     class Meta:
         model = Usuario
         fields = [
@@ -36,33 +41,32 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 class UsuarioListSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields_to_remove = [
-            'authentication_failures',
-            'data_criacao',
-            'hora_criacao',
-            'data_alteracao',
-            'hora_alteracao',
-            'hora_alteracao',
+        fields = [
+            'id',
+            'username',
+            'email',
+            'is_active',
+            'is_superuser',
+            'last_login',
             'owner_id'
         ]
-        fields = rn_remove_itens(UsuarioSerializer.Meta.fields.copy(), fields_to_remove)
 
 
 class UsuarioPutPathSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields_to_remove = ['email',]
-        read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
+        fields = ['email',]
+        read_only_fields = []
 
 
+# Use todos os campos para ser retornado no serializer
 class UsuarioPostSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields_to_remove = [
+        fields = [
             'username',
-            'password',
             'email',
-            'owner_id'
+            'password'
         ]
-        read_only_fields = rn_remove_itens(UsuarioSerializer.Meta.read_only_fields.copy(), fields_to_remove)
+        read_only_fields = []
 
 
 class UsuarioAtivarInativarSerializer(UsuarioSerializer):
