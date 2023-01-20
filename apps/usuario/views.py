@@ -18,7 +18,8 @@ from .models import Usuario
 from .serializers import (
     UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
     UsuarioPostSerializer, ObterParTokensSerializer, UsuarioRedefinirSenhaSerializer,
-    UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer
+    UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer,
+    UsuarioTransformarAdminSerializer
 )
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
@@ -109,6 +110,26 @@ class UsuarioViewSet(BaseModelViewSet):
             return Response({'detail': 'O token é inválido ou expirado.' }, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(f'A senha do usuário { jwt_redefinir_senha } foi redefinida!', status=status.HTTP_200_OK)
+
+
+    @action(
+        methods=['patch'],
+        detail=True,
+        url_path='transformar-admin',
+        url_name='transformar-admin',
+    )
+    def transformar_admin(self, request, pk):
+        usuario = self.get_object()
+        serializer = UsuarioTransformarAdminSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        usuario.is_superuser = serializer.data.get('is_superuser')
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     @action(
         methods=['patch'],

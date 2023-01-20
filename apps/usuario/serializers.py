@@ -11,7 +11,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Usuario
 from apps.auditoria.models import LogAutenticacao
-from apps.core.utils import rn_remove_itens
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -54,25 +53,33 @@ class UsuarioListSerializer(UsuarioSerializer):
 
 class UsuarioPutPathSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields = ['email',]
-        read_only_fields = []
+        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['email',]]
 
 
-# Use todos os campos para ser retornado no serializer
 class UsuarioPostSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields = [
+        fields = UsuarioSerializer.Meta.fields.copy() + ['password',]
+        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in [
             'username',
             'email',
             'password'
-        ]
-        read_only_fields = []
+        ]]
+
+
+class UsuarioTransformarAdminSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_superuser',]]
+        extra_kwargs = {
+            'is_superuser': {'allow_null': False, 'required': True}
+        }
 
 
 class UsuarioAtivarInativarSerializer(UsuarioSerializer):
     class Meta(UsuarioSerializer.Meta):
-        fields = ['is_active',]
-        read_only_fields = []
+        read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_active',]]
+        extra_kwargs = {
+            'is_active': {'allow_null': False, 'required': True}
+        }
 
 
 class UsuarioRedefinirSenhaSerializer(serializers.Serializer):
