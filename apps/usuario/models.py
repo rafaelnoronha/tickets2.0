@@ -85,6 +85,8 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar um usuário'),
+            ('desbloquear', 'Permite desbloquear um usuário bloqueado por errar a senha x vezes'),
+            ('transformar_admin', 'Permite transformar um usuário em administrador ou não'),
         )
 
 

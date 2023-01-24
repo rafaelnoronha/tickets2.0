@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.decorators import permission_required
 
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenViewBase
@@ -21,11 +22,13 @@ from .serializers import (
     UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer,
     UsuarioTransformarAdminSerializer
 )
+from apps.core.permissions import BasePemission
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
 
 
 class UsuarioViewSet(BaseModelViewSet):
+    permission_classes = (BasePemission, )
     queryset = Usuario.objects.all()
     serializer_class = UsuarioListSerializer
 
@@ -43,7 +46,7 @@ class UsuarioViewSet(BaseModelViewSet):
         url_path=r'(?P<email_usuario>\w+@[a-z]+(\.[a-z]+)+)/solicitar-redefinicao-senha',
         url_name='solicitar-redefinicao-senha',
     )
-    def esqueci_minha_senha(self, request, email_usuario):
+    def solicitar_redefinicao_senha(self, request, email_usuario):
         usuario = get_object_or_404(Usuario, email=email_usuario)
         uuid_password_reset = str(uuid.uuid4())
 
@@ -112,6 +115,7 @@ class UsuarioViewSet(BaseModelViewSet):
         return Response(f'A senha do usuário { jwt_redefinir_senha } foi redefinida!', status=status.HTTP_200_OK)
 
 
+    @permission_required('transformar_admin')
     @action(
         methods=['patch'],
         detail=True,
@@ -154,6 +158,7 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @permission_required('desbloquear')
     @action(
         methods=['patch'],
         detail=True,
@@ -169,6 +174,7 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @permission_required('ativar_inativar')
     @action(
         methods=['patch'],
         detail=True,
