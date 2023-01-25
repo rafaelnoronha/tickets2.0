@@ -14,6 +14,7 @@ from datetime import datetime, timezone, timedelta
 from jwt import encode as jwt_encode, decode as jwt_decode
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
+from rest_framework.permissions import BasePermission
 
 from .models import Usuario
 from .serializers import (
@@ -25,6 +26,16 @@ from .serializers import (
 from apps.core.permissions import BasePemission
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
+
+
+class AtivarPermission(BasePermission):
+
+    def has_permission(self, request, view):
+        print(request.user.get_perms("ativar_inativar"))
+        if request.user.has_perms("usuario.ativar_inativar"):
+            return True
+
+        return False
 
 
 class UsuarioViewSet(BaseModelViewSet):
@@ -174,13 +185,13 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @permission_required('ativar_inativar')
     @action(
         methods=['patch'],
         detail=True,
         url_path='ativar-inativar',
-        url_name='ativar-inativar',
+        url_name='ativar-inativar'
     )
+    @permission_required("usuarios.ativar_inativar")
     def ativa_invativar(self, request, pk):
         usuario = self.get_object()
 
