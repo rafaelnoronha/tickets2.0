@@ -157,13 +157,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Formatos de data aceitos na hora de criar ou altualizar os dados
-# https://docs.djangoproject.com/en/4.1/ref/settings/#date-input-formats
-
-DATE_FORMAT = ['%d-%m-%Y'],
-DATE_INPUT_FORMATS = ["%d-%m-%Y", "%Y-%m-%d"],
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -187,11 +180,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissions',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         'apps.usuario.authentication.JWTAuthenticationCustom',
     ],
-    # 'DATE_FORMAT': '%d-%m-%Y',
-    # 'DATE_INPUT_FORMATS': ["%d-%m-%Y", "%Y-%m-%d"],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 15,
+    'DATE_FORMAT': "%d-%m-%Y",
+    'DATE_INPUT_FORMATS': ["%d-%m-%Y", "%Y-%m-%d"],
 }
 
 
@@ -207,6 +202,4 @@ SIMPLE_JWT = {
 
     'USER_ID_FIELD': 'id',
     'USER_AUTHENTICATION_RULE': 'apps.usuario.authentication.regra_padrao_autenticacao_usuario',
-
-    # 'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken', 'apps.usuario.tokens.ValidarTokenAcesso',),
 }

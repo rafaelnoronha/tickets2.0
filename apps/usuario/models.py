@@ -63,6 +63,18 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         help_text='Informa se o usuário está ativo ou inativo',
     )
 
+    is_staff = models.BooleanField(
+        verbose_name='Is staff',
+        default=False,
+        help_text='Informa se o usuário é um atendente',
+    )
+
+    is_manager = models.BooleanField(
+        verbose_name='Is manager',
+        default=False,
+        help_text='Informa se o usuário é um gerente',
+    )
+
     ativo = None
     empresa = None
 
@@ -87,6 +99,7 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
             ('ativar_inativar', 'Permite ativar ou inativar um usuário'),
             ('desbloquear', 'Permite desbloquear um usuário bloqueado por errar a senha x vezes'),
             ('transformar_admin', 'Permite transformar um usuário em administrador ou não'),
+            ('transformar_gerente', 'Permite transformar um usuário em gerente ou não'),
         )
 
 

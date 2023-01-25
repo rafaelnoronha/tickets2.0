@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.models import update_last_login
+from django.contrib.auth.models import update_last_login, Group, Permission
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from user_agents import parse
@@ -27,6 +27,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'email',
             'is_active',
             'is_superuser',
+            'is_staff',
+            'is_manager',
             'authentication_failures',
             'last_login',
             'data_criacao',
@@ -46,6 +48,7 @@ class UsuarioListSerializer(UsuarioSerializer):
             'email',
             'is_active',
             'is_superuser',
+            'is_manager',
             'last_login',
             'owner_id'
         ]
@@ -62,7 +65,8 @@ class UsuarioPostSerializer(UsuarioSerializer):
         read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in [
             'username',
             'email',
-            'password'
+            'password',
+            'is_staff'
         ]]
 
 
@@ -71,6 +75,14 @@ class UsuarioTransformarAdminSerializer(UsuarioSerializer):
         read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_superuser',]]
         extra_kwargs = {
             'is_superuser': {'allow_null': False, 'required': True}
+        }
+
+
+class UsuarioTransformarGerenteSerializer(UsuarioSerializer):
+    class Meta(UsuarioSerializer.Meta):
+        read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_manager',]]
+        extra_kwargs = {
+            'is_manager': {'allow_null': False, 'required': True}
         }
 
 
@@ -139,6 +151,56 @@ class UsuarioAlterarSenhaSerializer(serializers.Serializer):
             'current_password',
             'new_password',
             'new_password_confirmation'
+        ]
+
+
+class PermissaoUsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        read_only_fields = [
+            'id',
+            'name',
+            'content_type',
+            'codename',
+        ]
+        fields = [
+            'id',
+            'name',
+            'content_type',
+            'codename',
+        ]
+
+
+class GrupoPermissoesUsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        read_only_fields = ['id',]
+        fields = [
+            'id',
+            'name',
+        ]
+
+
+class GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate(GrupoPermissoesUsuarioSerializer):
+    permissions = serializers.SlugRelatedField(queryset=Permission.objects.all(), slug_field='id', many=True)
+
+    class Meta(GrupoPermissoesUsuarioSerializer.Meta):
+        fields = [
+            'id',
+            'name',
+            'permissions',
+        ]
+
+
+class GrupoPermissoesUsuarioSerializerRetrieve(GrupoPermissoesUsuarioSerializer):
+    permissions = PermissaoUsuarioSerializer(many=True)
+
+    class Meta(GrupoPermissoesUsuarioSerializer.Meta):
+        read_only_fields = ['id',]
+        fields = [
+            'id',
+            'name',
+            'permissions',
         ]
 
 

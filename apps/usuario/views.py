@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.decorators import permission_required
 
-from rest_framework import status
+from rest_framework import status, viewsets, mixins
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -14,34 +14,31 @@ from datetime import datetime, timezone, timedelta
 from jwt import encode as jwt_encode, decode as jwt_decode
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
-from rest_framework.permissions import BasePermission
 
 from .models import Usuario
+from .filters import UsuarioFilter
+from .permissions import (
+    AtivarPermission, DesbloquearPermission, TransformaAdminPermission,
+    TransformaGerentePermission
+)
 from .serializers import (
     UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
     UsuarioPostSerializer, ObterParTokensSerializer, UsuarioRedefinirSenhaSerializer,
     UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer,
-    UsuarioTransformarAdminSerializer
+    UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioSerializer,
+    GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate, GrupoPermissoesUsuarioSerializerRetrieve,
+    PermissaoUsuarioSerializer
 )
 from apps.core.permissions import BasePemission
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
 
 
-class AtivarPermission(BasePermission):
-
-    def has_permission(self, request, view):
-        print(request.user.get_perms("ativar_inativar"))
-        if request.user.has_perms("usuario.ativar_inativar"):
-            return True
-
-        return False
-
-
 class UsuarioViewSet(BaseModelViewSet):
     permission_classes = (BasePemission, )
     queryset = Usuario.objects.all()
     serializer_class = UsuarioListSerializer
+    filterset_class = UsuarioFilter
 
     serializer_classes = {
         'retrieve': UsuarioSerializer,
@@ -49,6 +46,9 @@ class UsuarioViewSet(BaseModelViewSet):
         'update': UsuarioPutPathSerializer,
         'partial_update': UsuarioPutPathSerializer,
     }
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, UsuarioListSerializer)
 
     @action(
         methods=['get'],
@@ -125,13 +125,12 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(f'A senha do usuário { jwt_redefinir_senha } foi redefinida!', status=status.HTTP_200_OK)
 
-
-    @permission_required('transformar_admin')
     @action(
         methods=['patch'],
         detail=True,
         url_path='transformar-admin',
         url_name='transformar-admin',
+        permission_classes=[TransformaAdminPermission,]
     )
     def transformar_admin(self, request, pk):
         usuario = self.get_object()
@@ -145,6 +144,24 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(
+        methods=['patch'],
+        detail=True,
+        url_path='transformar-gerente',
+        url_name='transformar-gerente',
+        permission_classes=[TransformaGerentePermission,]
+    )
+    def transformar_gerente(self, request, pk):
+        usuario = self.get_object()
+        serializer = UsuarioTransformarGerenteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        usuario.is_manager = serializer.data.get('is_manager')
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         methods=['patch'],
@@ -169,12 +186,12 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @permission_required('desbloquear')
     @action(
         methods=['patch'],
         detail=True,
         url_path='desbloquear',
         url_name='desbloquear',
+        permission_classes=[DesbloquearPermission,]
     )
     def desbloquear(self, request, pk):
         usuario = self.get_object()
@@ -189,9 +206,9 @@ class UsuarioViewSet(BaseModelViewSet):
         methods=['patch'],
         detail=True,
         url_path='ativar-inativar',
-        url_name='ativar-inativar'
+        url_name='ativar-inativar',
+        permission_classes=[AtivarPermission,]
     )
-    @permission_required("usuarios.ativar_inativar")
     def ativa_invativar(self, request, pk):
         usuario = self.get_object()
 
@@ -204,6 +221,28 @@ class UsuarioViewSet(BaseModelViewSet):
         serializer = UsuarioSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GrupoPermissoesUsuarioSerializer
+    permission_classes = (BasePemission, )
+
+    serializer_classes = {
+        'retrieve': GrupoPermissoesUsuarioSerializerRetrieve,
+        'create': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
+        'update': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
+        'partial_update': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
+    }
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, GrupoPermissoesUsuarioSerializer)
+
+
+class PermissaoUsuarioViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermissaoUsuarioSerializer
+    permission_classes = (BasePemission, )
 
 
 class ObterParTokensView(TokenViewBase):

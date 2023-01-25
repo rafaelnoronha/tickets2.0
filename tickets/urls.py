@@ -18,7 +18,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.usuario.views import ObterParTokensView
-from apps.usuario.urls import usuario_router
+from apps.usuario.urls import usuario_router, router_permissao_usuario, router_grupo_permissoes_usuario
 
 api_v1 = 'api/v1'
 
@@ -26,4 +26,6 @@ urlpatterns = [
     path(f"{api_v1}/token/", ObterParTokensView.as_view(), name='token_obtain_pair'),
     path(f"{api_v1}/refresh/", TokenRefreshView.as_view(), name='token_refresh'),
     path(f"{api_v1}/usuario/", include(usuario_router.urls)),
+    path(f"{api_v1}/grupo-usuario/", include(router_grupo_permissoes_usuario.urls)),
+    path(f"{api_v1}/permissao-usuario/", include(router_permissao_usuario.urls)),
 ]
