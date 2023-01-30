@@ -157,20 +157,6 @@ class PerfilUsuario(Base):
         help_text='Observações referênte ao usuário',
     )
 
-    ps_atendente = models.CharField(
-        verbose_name='Atendente',
-        max_length=1,
-        default='N',
-        help_text='Se é gerente, caso seja, existem privilégios padrões para um usuário do tipo gerente',
-    )
-
-    ps_gerente = models.CharField(
-        verbose_name='Gerente',
-        max_length=1,
-        default='N',
-        help_text='Este campo informa se o usuáio é gerente ou não',
-    )
-
     ativo = None
 
 

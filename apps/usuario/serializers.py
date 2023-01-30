@@ -14,6 +14,8 @@ from apps.auditoria.models import LogAutenticacao
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True)
+
     def validate_password(self, password):
         validate_password(password)
 
@@ -25,6 +27,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
+            'groups',
             'is_active',
             'is_superuser',
             'is_staff',
@@ -55,18 +58,23 @@ class UsuarioListSerializer(UsuarioSerializer):
 
 
 class UsuarioPutPathSerializer(UsuarioSerializer):
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='id', many=True, required=True)
+
     class Meta(UsuarioSerializer.Meta):
-        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['email',]]
+        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['email', 'groups']]
 
 
 class UsuarioPostSerializer(UsuarioSerializer):
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='id', many=True, required=True)
+
     class Meta(UsuarioSerializer.Meta):
         fields = UsuarioSerializer.Meta.fields.copy() + ['password',]
         read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in [
             'username',
             'email',
             'password',
-            'is_staff'
+            'is_staff',
+            'groups'
         ]]
 
 
