@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from apps.core.models import Base
+from apps.empresa.models import Empresa
 
 
 class UserManagerCustom(UserManager):
@@ -102,6 +103,80 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
             ('transformar_gerente', 'Permite transformar um usuário em gerente ou não'),
         )
 
+    def __str__(self):
+        return str(self.id)
+
+
+class UsuarioEmpresa(Base):
+    sm_usuario = models.ForeignKey(
+        Usuario,
+        verbose_name='Usuário',
+        on_delete=models.CASCADE,
+        related_name='rl_sm_usuario',
+        help_text='Usuário que terá acessoa à empresa',
+    )
+
+    sm_empresa = models.ForeignKey(
+        Empresa,
+        verbose_name='Empresa',
+        on_delete=models.CASCADE,
+        related_name='rl_sm_usuario',
+        help_text='Empresa que será acessada pelo usuário',
+    )
+
+    empresa = None
+
+    class Meta:
+        db_table = 'tc_usuario_empresa'
+        verbose_name = 'Usuário Empresa'
+        verbose_name_plural = 'Usuários Empresa'
+        ordering = ['-id',]
+        unique_together = ['sm_usuario', 'sm_empresa']
+        indexes = [
+            models.Index(fields=['sm_usuario',], name='idx_sm_usuario'),
+            models.Index(fields=['sm_empresa',], name='idx_sm_empresa'),
+        ]
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Classificacao(Base):
+    """
+    Modelo da classificação dos usuários.
+    """
+
+    cl_codigo = models.CharField(
+        verbose_name='Código',
+        max_length=20,
+        unique=True,
+        help_text='Código da Classificação',
+    )
+
+    cl_nome = models.CharField(
+        verbose_name='Nome',
+        max_length=50,
+        help_text='Nome da classificação',
+    )
+
+    cl_descricao = models.TextField(
+        verbose_name='descricao',
+        help_text='Descrição da classificação',
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ['-id']
+        db_table = 'tc_classificacao'
+        verbose_name = 'Classificacao'
+        verbose_name_plural = 'Classificacoes'
+        indexes = [
+            models.Index(fields=['cl_codigo'], name='idx_cl_codigo'),
+        ]
+
+    def __str__(self):
+        return str(self.id)
+
 
 class PerfilUsuario(Base):
     """
@@ -113,11 +188,13 @@ class PerfilUsuario(Base):
         verbose_name='Usuário',
         on_delete=models.CASCADE,
         related_name='rl_ps_usuario',
+        help_text='Usuário vinculado ao perfil',
     )
 
     ps_nome = models.CharField(
         verbose_name='Nome',
         max_length=150,
+        help_text='Nome do usuário',
     )
 
     ps_telefone = models.CharField(
@@ -133,14 +210,14 @@ class PerfilUsuario(Base):
         help_text='Telefone celular ex: 31900000000',
     )
 
-    # sr_classificacao = models.ForeignKey(
-    #     Classificacao,
-    #     verbose_name='Classificação',
-    #     related_name='rl_sr_classificacao',
-    #     null=True,
-    #     on_delete=models.PROTECT,
-    #     help_text='A qual classificação de usuário o ticket é designado'
-    # )
+    ps_classificacao = models.ForeignKey(
+        Classificacao,
+        verbose_name='Classificação',
+        related_name='rl_sr_classificacao',
+        null=True,
+        on_delete=models.PROTECT,
+        help_text='A qual classificação de usuário o ticket é designado'
+    )
 
     ps_media_avaliacoes = models.DecimalField(
         verbose_name='Média das avaliações',
@@ -158,6 +235,7 @@ class PerfilUsuario(Base):
     )
 
     ativo = None
+    empresa = None
 
 
     class Meta:
@@ -167,8 +245,8 @@ class PerfilUsuario(Base):
         verbose_name_plural = 'Perfis dos Usuários'
         indexes = [
             models.Index(fields=['ps_usuario',], name='idx_ps_usuario'),
-            models.Index(fields=['empresa',], name='idx_ps_empresa'),
+            models.Index(fields=['ps_media_avaliacoes',], name='idx_ps_media_avaliacoes'),
         ]
-        permissions = (
-            ('transformar_em_gerente', 'Concede privilégios de um gerente ao usuário'),
-        )
+
+    def __str__(self):
+        return str(self.id)
