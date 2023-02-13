@@ -1,6 +1,7 @@
 from django.db import models
 
 from apps.core.models import Base, SIM_NAO_CHOICE, UF_CHOICES
+from apps.core.validators import CepValidator, TelefoneValidator
 
 
 PAISES_CHOISES = [
@@ -330,9 +331,9 @@ class Empresa(Base):
         verbose_name='CEP',
         max_length=8,
         help_text='CEP(apenas números)',
-        # validators=[
-        #     RegexValidator(regex=RegexCep.get_regex(), message=RegexCep.get_mensagem()),
-        # ],
+        validators=[
+            CepValidator,
+        ],
     )
 
     mp_pais = models.CharField(
@@ -347,15 +348,13 @@ class Empresa(Base):
         verbose_name='Telefone',
         max_length=10,
         help_text='Número do telefone de contato(apenas números)',
-        # validators=[
-        #     RegexValidator(regex=RegexTelefone.get_regex(), message=RegexTelefone.get_mensagem()),
-        # ],
+        validators=[
+            TelefoneValidator,
+        ],
     )
 
-    mp_media_avaliacoes = models.DecimalField(
+    mp_media_avaliacoes = models.FloatField(
         verbose_name='Média das avaliações',
-        max_digits=2,
-        decimal_places=1,
         default=0,
         help_text='Média das avaliações dos chamados',
     )
@@ -368,7 +367,6 @@ class Empresa(Base):
     )
 
     empresa = None
-    owner_id = None
 
 
     class Meta:
@@ -377,10 +375,11 @@ class Empresa(Base):
         verbose_name = 'Empresa'
         verbose_name_plural = 'Empresas'
         indexes = [
+            models.Index(fields=['mp_cpf_cnpj'], name='idx_mp_cpf_cnpj'),
             models.Index(fields=['mp_media_avaliacoes'], name='idx_mp_media_avaliacoes'),
             models.Index(fields=['mp_municipio'], name='idx_mp_municipio'),
             models.Index(fields=['mp_uf'], name='idx_mp_uf'),
-            models.Index(fields=['mp_pais'], name='idx_mp_pais'),
+            models.Index(fields=['owner_id'], name='idx_mp_owner_id'),
         ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar uma empresa'),
