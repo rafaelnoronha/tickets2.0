@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.db.models import Q
 from django.template.loader import render_to_string
 
-from .models import Parametro
+from apps.parametro.models import Parametro
 from apps.empresa.models import Empresa
 
 

@@ -4,7 +4,6 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from apps.core.models import Base
-from apps.empresa.models import Empresa
 
 
 class UserManagerCustom(UserManager):
@@ -21,7 +20,7 @@ class UserManagerCustom(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class Usuario(Base, AbstractBaseUser, PermissionsMixin):
+class Usuario(AbstractBaseUser, PermissionsMixin):
     """
     Modelo que armazena os dados de autenticação dos usuários(clientes e prestadores de serviço).
     """
@@ -76,8 +75,37 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         help_text='Informa se o usuário é um gerente',
     )
 
-    ativo = None
-    empresa = None
+    data_criacao = models.DateField(
+        verbose_name='Data de Criação',
+        auto_now_add=True,
+        help_text='Data da criação do registro'
+    )
+
+    hora_criacao = models.TimeField(
+        verbose_name='Hora de Criação',
+        auto_now_add=True,
+        help_text='Hora da criação do registro'
+    )
+
+    data_alteracao = models.DateField(
+        verbose_name='Data da Alteração',
+        auto_now=True,
+        help_text='Data da alteração do registro'
+    )
+
+    hora_alteracao = models.TimeField(
+        verbose_name='Hora da Alteração',
+        auto_now=True,
+        help_text='Hora da alteração do registro'
+    )
+
+    owner_id = models.ForeignKey(
+        'usuario.Usuario',
+        verbose_name='Owner Id',
+        on_delete=models.PROTECT,
+        null=True,
+        help_text='Para qual empresa o parâmetro será usado',
+    )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
@@ -117,7 +145,7 @@ class UsuarioEmpresa(Base):
     )
 
     sm_empresa = models.ForeignKey(
-        Empresa,
+        'empresa.Empresa',
         verbose_name='Empresa',
         on_delete=models.CASCADE,
         related_name='rl_sm_usuario',
@@ -135,117 +163,6 @@ class UsuarioEmpresa(Base):
         indexes = [
             models.Index(fields=['sm_usuario',], name='idx_sm_usuario'),
             models.Index(fields=['sm_empresa',], name='idx_sm_empresa'),
-        ]
-
-    def __str__(self):
-        return str(self.id)
-
-
-class Classificacao(Base):
-    """
-    Modelo da classificação dos usuários.
-    """
-
-    cl_codigo = models.CharField(
-        verbose_name='Código',
-        max_length=20,
-        unique=True,
-        help_text='Código da Classificação',
-    )
-
-    cl_nome = models.CharField(
-        verbose_name='Nome',
-        max_length=50,
-        help_text='Nome da classificação',
-    )
-
-    cl_descricao = models.TextField(
-        verbose_name='descricao',
-        help_text='Descrição da classificação',
-        blank=True,
-    )
-
-    class Meta:
-        ordering = ['-id']
-        db_table = 'tc_classificacao'
-        verbose_name = 'Classificacao'
-        verbose_name_plural = 'Classificacoes'
-        indexes = [
-            models.Index(fields=['cl_codigo'], name='idx_cl_codigo'),
-        ]
-
-    def __str__(self):
-        return str(self.id)
-
-
-class PerfilUsuario(Base):
-    """
-    Modelo que armazena os dados "adicionais" dos usuários(clientes e prestadores de serviço).
-    """
-
-    ps_usuario = models.OneToOneField(
-        Usuario,
-        verbose_name='Usuário',
-        on_delete=models.CASCADE,
-        related_name='rl_ps_usuario',
-        help_text='Usuário vinculado ao perfil',
-    )
-
-    ps_nome = models.CharField(
-        verbose_name='Nome',
-        max_length=150,
-        help_text='Nome do usuário',
-    )
-
-    ps_telefone = models.CharField(
-        verbose_name='Telefone',
-        max_length=10,
-        help_text='Telefone fixo ex: 3100000000',
-    )
-
-    ps_celular = models.CharField(
-        verbose_name='Celular',
-        max_length=11,
-        blank=True,
-        help_text='Telefone celular ex: 31900000000',
-    )
-
-    ps_classificacao = models.ForeignKey(
-        Classificacao,
-        verbose_name='Classificação',
-        related_name='rl_sr_classificacao',
-        null=True,
-        on_delete=models.PROTECT,
-        help_text='A qual classificação de usuário o ticket é designado'
-    )
-
-    ps_media_avaliacoes = models.DecimalField(
-        verbose_name='Média das avaliações',
-        max_digits=2,
-        decimal_places=1,
-        default=0,
-        help_text='Média das avaliações dos chamados',
-    )
-
-    ps_observacoes = models.CharField(
-        verbose_name='Observações',
-        max_length=4000,
-        blank=True,
-        help_text='Observações referênte ao usuário',
-    )
-
-    ativo = None
-    empresa = None
-
-
-    class Meta:
-        db_table = 'tc_perfil_usuario'
-        ordering = ['-id',]
-        verbose_name = 'Perfil do Usuário'
-        verbose_name_plural = 'Perfis dos Usuários'
-        indexes = [
-            models.Index(fields=['ps_usuario',], name='idx_ps_usuario'),
-            models.Index(fields=['ps_media_avaliacoes',], name='idx_ps_media_avaliacoes'),
         ]
 
     def __str__(self):

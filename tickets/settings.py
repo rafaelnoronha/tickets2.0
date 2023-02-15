@@ -51,9 +51,13 @@ OTHER_APPS = [
 
 MY_APPS = [
     'apps.core',
-    'apps.usuario',
+    'apps.parametro',
     'apps.auditoria',
+    'apps.lgpd',
+    'apps.usuario',
+    'apps.perfil',
     'apps.empresa',
+    'apps.ticket',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OTHER_APPS + MY_APPS
