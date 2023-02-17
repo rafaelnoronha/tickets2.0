@@ -40,14 +40,15 @@ class DefaultData:
     ]
 
     def gerar_parametros(self):
-        from .models import Parametro
+        pass
+        # from apps.parametro.models import Parametro
 
-        for parametro in self.__parametros:
-            parametro_criado, criado = Parametro.objects.get_or_create(
-                pr_codigo=parametro.get('pr_codigo'),
-                empresa=parametro.get('empresa'),
-                defaults=parametro
-            )
+        # for parametro in self.__parametros:
+        #     parametro_criado, criado = Parametro.objects.get_or_create(
+        #         pr_codigo=parametro.get('pr_codigo'),
+        #         empresa=parametro.get('empresa'),
+        #         defaults=parametro
+        #     )
 
-            if criado:
-                print(f"-> Parâmetro { parametro_criado.pr_codigo } criado.")
+        #     if criado:
+        #         print(f"-> Parâmetro { parametro_criado.pr_codigo } criado.")
