@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from apps.core.models import Base
 from apps.usuario.models import Usuario
@@ -24,9 +25,10 @@ class Classificacao(Base):
 
     cl_descricao = models.TextField(
         verbose_name='descricao',
-        help_text='Descrição da classificação',
         blank=True,
+        help_text='Descrição da classificação',
     )
+
 
     class Meta:
         ordering = ['-id']
@@ -78,15 +80,18 @@ class PerfilUsuario(Base):
         verbose_name='Classificação',
         related_name='rl_sr_classificacao',
         null=True,
+        blank=True,
         on_delete=models.PROTECT,
         help_text='A qual classificação de usuário o ticket é designado'
     )
 
-    ps_media_avaliacoes = models.DecimalField(
+    ps_media_avaliacoes = models.FloatField(
         verbose_name='Média das avaliações',
-        max_digits=2,
-        decimal_places=1,
         default=0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ],
         help_text='Média das avaliações dos chamados',
     )
 
@@ -109,6 +114,32 @@ class PerfilUsuario(Base):
         indexes = [
             models.Index(fields=['ps_usuario',], name='idx_ps_usuario'),
             models.Index(fields=['ps_media_avaliacoes',], name='idx_ps_media_avaliacoes'),
+            models.Index(fields=['ps_classificacao',], name='idx_ps_classificacao'),
+        ]
+
+    def __str__(self):
+        return str(self.id)
+
+
+class PerfilUsuarioEmpresa(Base):
+    pm_perfil = models.ForeignKey(
+        PerfilUsuario,
+        verbose_name='Usuário',
+        on_delete=models.CASCADE,
+        related_name='rl_pm_perfil',
+        help_text='Perfil de usuário que terá acessoa à empresa',
+    )
+
+
+    class Meta:
+        db_table = 'tc_perfil_usuario_empresa'
+        verbose_name = 'Perfil Usuário Empresa'
+        verbose_name_plural = 'Perfis Usuário Empresa'
+        ordering = ['-id',]
+        unique_together = ['pm_perfil', 'empresa']
+        indexes = [
+            models.Index(fields=['pm_perfil',], name='idx_pm_perfil'),
+            models.Index(fields=['empresa',], name='idx_empresa'),
         ]
 
     def __str__(self):

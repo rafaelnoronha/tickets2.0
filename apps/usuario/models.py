@@ -20,7 +20,7 @@ class UserManagerCustom(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class Usuario(AbstractBaseUser, PermissionsMixin):
+class Usuario(Base, AbstractBaseUser, PermissionsMixin):
     """
     Modelo que armazena os dados de autenticação dos usuários(clientes e prestadores de serviço).
     """
@@ -75,37 +75,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         help_text='Informa se o usuário é um gerente',
     )
 
-    data_criacao = models.DateField(
-        verbose_name='Data de Criação',
-        auto_now_add=True,
-        help_text='Data da criação do registro'
-    )
-
-    hora_criacao = models.TimeField(
-        verbose_name='Hora de Criação',
-        auto_now_add=True,
-        help_text='Hora da criação do registro'
-    )
-
-    data_alteracao = models.DateField(
-        verbose_name='Data da Alteração',
-        auto_now=True,
-        help_text='Data da alteração do registro'
-    )
-
-    hora_alteracao = models.TimeField(
-        verbose_name='Hora da Alteração',
-        auto_now=True,
-        help_text='Hora da alteração do registro'
-    )
-
-    owner_id = models.ForeignKey(
-        'usuario.Usuario',
-        verbose_name='Owner Id',
-        on_delete=models.PROTECT,
-        null=True,
-        help_text='Para qual empresa o parâmetro será usado',
-    )
+    empresa = None
+    ativo = None
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
@@ -130,40 +101,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             ('transformar_admin', 'Permite transformar um usuário em administrador ou não'),
             ('transformar_gerente', 'Permite transformar um usuário em gerente ou não'),
         )
-
-    def __str__(self):
-        return str(self.id)
-
-
-class UsuarioEmpresa(Base):
-    sm_usuario = models.ForeignKey(
-        Usuario,
-        verbose_name='Usuário',
-        on_delete=models.CASCADE,
-        related_name='rl_sm_usuario',
-        help_text='Usuário que terá acessoa à empresa',
-    )
-
-    sm_empresa = models.ForeignKey(
-        'empresa.Empresa',
-        verbose_name='Empresa',
-        on_delete=models.CASCADE,
-        related_name='rl_sm_usuario',
-        help_text='Empresa que será acessada pelo usuário',
-    )
-
-    empresa = None
-
-    class Meta:
-        db_table = 'tc_usuario_empresa'
-        verbose_name = 'Usuário Empresa'
-        verbose_name_plural = 'Usuários Empresa'
-        ordering = ['-id',]
-        unique_together = ['sm_usuario', 'sm_empresa']
-        indexes = [
-            models.Index(fields=['sm_usuario',], name='idx_sm_usuario'),
-            models.Index(fields=['sm_empresa',], name='idx_sm_empresa'),
-        ]
 
     def __str__(self):
         return str(self.id)

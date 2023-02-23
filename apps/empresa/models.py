@@ -379,7 +379,7 @@ class Empresa(Base):
             models.Index(fields=['mp_media_avaliacoes'], name='idx_mp_media_avaliacoes'),
             models.Index(fields=['mp_municipio'], name='idx_mp_municipio'),
             models.Index(fields=['mp_uf'], name='idx_mp_uf'),
-            models.Index(fields=['owner_id'], name='idx_mp_owner_id'),
+            # models.Index(fields=['owner_id'], name='idx_mp_owner_id'),
         ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar uma empresa'),
