@@ -35,7 +35,7 @@ class Parametro(Base):
         indexes = [
             models.Index(fields=['pr_codigo',], name='idx_pr_codigo'),
             models.Index(fields=['empresa',], name='idx_pr_empresa'),
-            models.Index(fields=['owner_id',], name='idx_bs_owner_id'),
+            # models.Index(fields=['owner_id',], name='idx_bs_owner_id'),
         ]
         unique_together = [
             ['pr_codigo', 'empresa'],

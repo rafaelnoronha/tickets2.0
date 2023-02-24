@@ -50,13 +50,13 @@ OTHER_APPS = [
 ]
 
 MY_APPS = [
+    'apps.usuario',
     'apps.core',
+    'apps.empresa',
     'apps.parametro',
     'apps.auditoria',
     'apps.lgpd',
-    'apps.usuario',
     'apps.perfil',
-    'apps.empresa',
     'apps.ticket',
 ]
 
