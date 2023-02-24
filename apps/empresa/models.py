@@ -332,7 +332,7 @@ class Empresa(Base):
         max_length=8,
         help_text='CEP(apenas números)',
         validators=[
-            CepValidator,
+            CepValidator(),
         ],
     )
 
@@ -349,7 +349,7 @@ class Empresa(Base):
         max_length=10,
         help_text='Número do telefone de contato(apenas números)',
         validators=[
-            TelefoneValidator,
+            TelefoneValidator(),
         ],
     )
 

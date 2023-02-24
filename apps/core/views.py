@@ -7,4 +7,7 @@ class BaseModelViewSet(viewsets.ModelViewSet):
     serializer_classes = None
 
     def get_serializer_class(self):
-        return self.serializer_classes.get(self.action, self.serializer_class)
+        if self.serializer_classes:
+            return self.serializer_classes.get(self.action, self.serializer_class)
+        
+        return self.serializer_class
