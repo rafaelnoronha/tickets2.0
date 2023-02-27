@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.core.models import Base, SIM_NAO_CHOICE, UF_CHOICES
-from apps.core.validators import CepValidator, TelefoneValidator
+from apps.core.validators import CepValidator, TelefoneValidator, CpfCnpjValidator
 
 
 PAISES_CHOISES = [
@@ -274,6 +274,9 @@ class Empresa(Base):
         verbose_name='CPF/CNPJ',
         max_length=14,
         unique=True,
+        validators=[
+            CpfCnpjValidator(),
+        ],
         help_text='CPF ou CNPJ da empresa(apenas números)',
     )
 
@@ -379,7 +382,7 @@ class Empresa(Base):
             models.Index(fields=['mp_media_avaliacoes'], name='idx_mp_media_avaliacoes'),
             models.Index(fields=['mp_municipio'], name='idx_mp_municipio'),
             models.Index(fields=['mp_uf'], name='idx_mp_uf'),
-            # models.Index(fields=['owner_id'], name='idx_mp_owner_id'),
+            models.Index(fields=['owner_id'], name='idx_mp_owner_id'),
         ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar uma empresa'),
