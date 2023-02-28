@@ -207,3 +207,6 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_AUTHENTICATION_RULE': 'apps.usuario.authentication.regra_padrao_autenticacao_usuario',
 }
+
+# Documentação API
+# https://slatedocs.github.io/slate/#introduction

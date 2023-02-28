@@ -1,5 +1,6 @@
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.utils.deconstruct import deconstructible
 import functools
 import re
 
@@ -33,7 +34,17 @@ class CelularValidator(validators.RegexValidator):
     flags = 0
 
 
-class CpfValidator:
+@deconstructible
+class BaseClassValidator:
+    def __call__(self, *args, **kwds):
+        pass
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+
+@deconstructible
+class CpfValidator(BaseClassValidator):
     def __call__(self, value):
         cpf = list(map(lambda digito_cpf: int(digito_cpf), re.sub(r'\D', '', value)))
         array_validador = [10, 9, 8, 7, 6, 5, 4, 3, 2]
@@ -61,7 +72,8 @@ class CpfValidator:
             raise ValidationError('O CPF informado é inválido.')
         
 
-class CnpjValidator:
+@deconstructible
+class CnpjValidator(BaseClassValidator):
     def __call__(self, value):
         cnpj = list(map(lambda digito_cnpj: int(digito_cnpj), re.sub(r'\D', '', value)))
         array_validador = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
@@ -89,7 +101,8 @@ class CnpjValidator:
             raise ValidationError('O CNPJ informado é inválido.')
 
 
-class CpfCnpjValidator:
+@deconstructible
+class CpfCnpjValidator(BaseClassValidator):
     def __call__(self, value):
         if len(value) == 11:
             return CpfValidator()(value)

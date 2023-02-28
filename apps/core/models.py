@@ -55,6 +55,7 @@ class Base(models.Model):
         'empresa.Empresa',
         verbose_name='Empresa',
         on_delete=models.PROTECT,
+        related_name='rl_%(app_label)s_%(class)s',
         null=True,
         help_text='Para qual empresa o parâmetro será usado',
     )

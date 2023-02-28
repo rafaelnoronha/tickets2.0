@@ -13,6 +13,17 @@ from .models import Usuario
 from apps.auditoria.models import LogAutenticacao
 
 
+class UsuarioEssentialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = [
+            'id',
+            'username',
+            'email'
+        ]
+        read_only_fields = fields
+
+
 class UsuarioSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True)
 
