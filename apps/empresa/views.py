@@ -19,7 +19,7 @@ class EmpresaViewSet(BaseModelViewSet):
         'partial_update': EmpresaPutPatchSerializer,
     }
     actions = {
-        'ativa_invativar': {
+        'ativar_inativar': {
             'permission_classes': [AtivarPermission,],
             'serializer_class': EmpresaAtivarInativarSerializer
         }
