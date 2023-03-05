@@ -90,6 +90,8 @@ class UsuarioPostSerializer(UsuarioSerializer):
 
 
 class UsuarioTransformarAdminSerializer(UsuarioSerializer):
+    groups = None
+
     class Meta(UsuarioSerializer.Meta):
         read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_superuser',]]
         extra_kwargs = {
@@ -98,6 +100,8 @@ class UsuarioTransformarAdminSerializer(UsuarioSerializer):
 
 
 class UsuarioTransformarGerenteSerializer(UsuarioSerializer):
+    groups = None
+
     class Meta(UsuarioSerializer.Meta):
         read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_manager',]]
         extra_kwargs = {
@@ -106,10 +110,13 @@ class UsuarioTransformarGerenteSerializer(UsuarioSerializer):
 
 
 class UsuarioAtivarInativarSerializer(UsuarioSerializer):
+    groups = None
+
     class Meta(UsuarioSerializer.Meta):
-        read_only_fields = read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_active',]]
+        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_active',]]
+        print(read_only_fields)
         extra_kwargs = {
-            'is_active': {'allow_null': False, 'required': True}
+            'is_active': {'allow_null': False, 'required': True},
         }
 
 

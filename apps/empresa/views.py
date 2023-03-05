@@ -4,6 +4,7 @@ from .serializers import (
     EmpresaPutPatchSerializer, EmpresaAtivarInativarSerializer
 )
 from .permissions import AtivarInativarPermission
+from .filters import EmpresaFilterSet
 from apps.core.views import BaseModelViewSet
 from apps.core.decorators import action_ativar_inativar
 from apps.core.permissions import BasePemission
@@ -13,6 +14,7 @@ from apps.core.permissions import BasePemission
 class EmpresaViewSet(BaseModelViewSet):
     permission_classes = (BasePemission, )
     queryset = Empresa.objects.all()
+    filterset_class = EmpresaFilterSet
     serializer_class = EmpresaListSerializer
     serializer_classes = {
         'retrieve': EmpresaGetSerializer,

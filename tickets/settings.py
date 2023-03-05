@@ -187,9 +187,8 @@ REST_FRAMEWORK = {
         'apps.usuario.authentication.JWTAuthenticationCustom',
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.CustomPagination',
     'PAGE_SIZE': 15,
-    'DATE_FORMAT': "%d-%m-%Y",
     'DATE_INPUT_FORMATS': ["%d-%m-%Y", "%Y-%m-%d"],
 }
 

@@ -18,7 +18,7 @@ import uuid
 from .models import Usuario
 from .filters import UsuarioFilter
 from .permissions import (
-    AtivarPermission, DesbloquearPermission, TransformaAdminPermission,
+    AtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
     TransformaGerentePermission
 )
 from .serializers import (
@@ -30,21 +30,26 @@ from .serializers import (
     PermissaoUsuarioSerializer
 )
 from apps.core.permissions import BasePemission
+from apps.core.decorators import action_ativar_inativar
 from apps.core.views import BaseModelViewSet
 from apps.core.email import EmailHTML
 
 
+@action_ativar_inativar
 class UsuarioViewSet(BaseModelViewSet):
     permission_classes = (BasePemission, )
     queryset = Usuario.objects.all()
     serializer_class = UsuarioListSerializer
     filterset_class = UsuarioFilter
-
     serializer_classes = {
         'retrieve': UsuarioSerializer,
         'create': UsuarioPostSerializer,
         'update': UsuarioPutPathSerializer,
         'partial_update': UsuarioPutPathSerializer,
+    }
+    action_ativar_inativar = {
+        'permission': AtivarInativarPermission,
+        'serializer': UsuarioAtivarInativarSerializer,
     }
 
     def get_serializer_class(self):
@@ -202,25 +207,25 @@ class UsuarioViewSet(BaseModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(
-        methods=['patch'],
-        detail=True,
-        url_path='ativar-inativar',
-        url_name='ativar-inativar',
-        permission_classes=[AtivarPermission,]
-    )
-    def ativa_invativar(self, request, pk):
-        usuario = self.get_object()
+    # @action(
+    #     methods=['patch'],
+    #     detail=True,
+    #     url_path='ativar-inativar',
+    #     url_name='ativar-inativar',
+    #     permission_classes=[AtivarPermission,]
+    # )
+    # def ativa_invativar(self, request, pk):
+    #     usuario = self.get_object()
 
-        serializer = UsuarioAtivarInativarSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    #     serializer = UsuarioAtivarInativarSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
 
-        usuario.is_active = serializer.data.get( 'is_active' )
-        usuario.save()
+    #     usuario.is_active = serializer.data.get( 'is_active' )
+    #     usuario.save()
 
-        serializer = UsuarioSerializer(usuario)
+    #     serializer = UsuarioSerializer(usuario)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):
