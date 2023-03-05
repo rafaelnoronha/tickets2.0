@@ -54,6 +54,7 @@ class EmpresaPostSerializer(EmpresaListSerializer):
             'mp_cep',
             'mp_pais',
             'mp_telefone',
+            'mp_prestadora_servico',
             'empresa',
             'owner_id'
         ]]
