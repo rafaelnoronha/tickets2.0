@@ -2,28 +2,29 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from apps.core.models import Base
+from apps.core.validators import TelefoneValidator, CelularValidator
 from apps.usuario.models import Usuario
 
 
-class Classificacao(Base):
+class ClassificacaoUsuario(Base):
     """
     Modelo da classificação dos usuários.
     """
 
-    cl_codigo = models.CharField(
+    cs_codigo = models.CharField(
         verbose_name='Código',
         max_length=20,
         unique=True,
         help_text='Código da Classificação',
     )
 
-    cl_nome = models.CharField(
+    cs_nome = models.CharField(
         verbose_name='Nome',
         max_length=50,
         help_text='Nome da classificação',
     )
 
-    cl_descricao = models.TextField(
+    cs_descricao = models.TextField(
         verbose_name='descricao',
         blank=True,
         help_text='Descrição da classificação',
@@ -32,11 +33,11 @@ class Classificacao(Base):
 
     class Meta:
         ordering = ['-id']
-        db_table = 'tc_classificacao'
-        verbose_name = 'Classificacao'
-        verbose_name_plural = 'Classificacoes'
+        db_table = 'tc_classificacao_usuario'
+        verbose_name = 'Classificação do Usuário'
+        verbose_name_plural = 'Classificações de Usuário'
         indexes = [
-            models.Index(fields=['cl_codigo'], name='idx_cl_codigo'),
+            models.Index(fields=['cs_codigo'], name='idx_cs_codigo'),
         ]
 
     def __str__(self):
@@ -65,6 +66,9 @@ class PerfilUsuario(Base):
     ps_telefone = models.CharField(
         verbose_name='Telefone',
         max_length=10,
+        validators=[
+            TelefoneValidator()
+        ],
         help_text='Telefone fixo ex: 3100000000',
     )
 
@@ -72,11 +76,14 @@ class PerfilUsuario(Base):
         verbose_name='Celular',
         max_length=11,
         blank=True,
+        validators=[
+            CelularValidator()
+        ],
         help_text='Telefone celular ex: 31900000000',
     )
 
     ps_classificacao = models.ForeignKey(
-        Classificacao,
+        ClassificacaoUsuario,
         verbose_name='Classificação',
         related_name='rl_sr_classificacao',
         null=True,

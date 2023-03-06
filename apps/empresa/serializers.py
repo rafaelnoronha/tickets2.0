@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.decorators import action
 
 from .models import Empresa
 from apps.core.serializers import BaseSerializer

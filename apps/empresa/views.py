@@ -26,4 +26,3 @@ class EmpresaViewSet(BaseModelViewSet):
         'permission': AtivarInativarPermission,
         'serializer': EmpresaAtivarInativarSerializer,
     }
-    # filterset_class = UsuarioFilter

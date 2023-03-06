@@ -21,7 +21,7 @@ def lookup_types_usuario():
     return lookup
 
 
-class UsuarioFilter(filter.FilterSet):
+class UsuarioFilterSet(filter.FilterSet):
     class Meta:
         fields_usuario = lookup_types_usuario()
 

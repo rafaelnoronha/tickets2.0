@@ -29,5 +29,6 @@ urlpatterns = [
     path(f"{api_v1}/usuario/", include(usuario_router.urls)),
     path(f"{api_v1}/grupo-usuario/", include(router_grupo_permissoes_usuario.urls)),
     path(f"{api_v1}/permissao-usuario/", include(router_permissao_usuario.urls)),
+    # aqui o perfil do usuario
     path(f"{api_v1}/empresa/", include(empresa_router.urls)),
 ]

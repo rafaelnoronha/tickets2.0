@@ -114,7 +114,6 @@ class UsuarioAtivarInativarSerializer(UsuarioSerializer):
 
     class Meta(UsuarioSerializer.Meta):
         read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['is_active',]]
-        print(read_only_fields)
         extra_kwargs = {
             'is_active': {'allow_null': False, 'required': True},
         }
