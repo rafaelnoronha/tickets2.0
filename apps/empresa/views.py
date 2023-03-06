@@ -3,7 +3,7 @@ from .serializers import (
     EmpresaListSerializer, EmpresaGetSerializer, EmpresaPostSerializer,
     EmpresaPutPatchSerializer, EmpresaAtivarInativarSerializer
 )
-from .permissions import AtivarInativarPermission
+from .permissions import EmpresaAtivarInativarPermission
 from .filters import EmpresaFilterSet
 from apps.core.views import BaseModelViewSet
 from apps.core.decorators import action_ativar_inativar
@@ -23,6 +23,6 @@ class EmpresaViewSet(BaseModelViewSet):
         'partial_update': EmpresaPutPatchSerializer,
     }
     action_ativar_inativar = {
-        'permission': AtivarInativarPermission,
+        'permission': EmpresaAtivarInativarPermission,
         'serializer': EmpresaAtivarInativarSerializer,
     }

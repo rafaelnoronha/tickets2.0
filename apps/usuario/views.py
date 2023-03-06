@@ -16,7 +16,7 @@ from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
 
 from .models import Usuario
-from .filters import UsuarioFilter
+from .filters import UsuarioFilterSet
 from .permissions import (
     AtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
     TransformaGerentePermission
@@ -40,7 +40,7 @@ class UsuarioViewSet(BaseModelViewSet):
     permission_classes = (BasePemission, )
     queryset = Usuario.objects.all()
     serializer_class = UsuarioListSerializer
-    filterset_class = UsuarioFilter
+    filterset_class = UsuarioFilterSet
     serializer_classes = {
         'retrieve': UsuarioSerializer,
         'create': UsuarioPostSerializer,
@@ -206,26 +206,6 @@ class UsuarioViewSet(BaseModelViewSet):
         serializer = UsuarioSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # @action(
-    #     methods=['patch'],
-    #     detail=True,
-    #     url_path='ativar-inativar',
-    #     url_name='ativar-inativar',
-    #     permission_classes=[AtivarPermission,]
-    # )
-    # def ativa_invativar(self, request, pk):
-    #     usuario = self.get_object()
-
-    #     serializer = UsuarioAtivarInativarSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-
-    #     usuario.is_active = serializer.data.get( 'is_active' )
-    #     usuario.save()
-
-    #     serializer = UsuarioSerializer(usuario)
-
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):

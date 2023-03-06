@@ -109,9 +109,6 @@ class PerfilUsuario(Base):
         help_text='Observações referênte ao usuário',
     )
 
-    ativo = None
-    empresa = None
-
 
     class Meta:
         db_table = 'tc_perfil_usuario'
@@ -119,9 +116,7 @@ class PerfilUsuario(Base):
         verbose_name = 'Perfil do Usuário'
         verbose_name_plural = 'Perfis dos Usuários'
         indexes = [
-            models.Index(fields=['ps_usuario',], name='idx_ps_usuario'),
             models.Index(fields=['ps_media_avaliacoes',], name='idx_ps_media_avaliacoes'),
-            models.Index(fields=['ps_classificacao',], name='idx_ps_classificacao'),
         ]
 
     def __str__(self):
@@ -146,7 +141,6 @@ class PerfilUsuarioEmpresa(Base):
         unique_together = ['pm_perfil', 'empresa']
         indexes = [
             models.Index(fields=['pm_perfil',], name='idx_pm_perfil'),
-            models.Index(fields=['empresa',], name='idx_empresa'),
         ]
 
     def __str__(self):

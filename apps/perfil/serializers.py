@@ -8,7 +8,7 @@ from apps.usuario.serializers import UsuarioEssentialSerializer
 from apps.usuario.models import Usuario
 
 
-class PerfilListSerializer(BaseSerializer):
+class PerfilUsuarioListSerializer(BaseSerializer):
     class Meta:
         model = PerfilUsuario
         fields = [
@@ -24,19 +24,19 @@ class PerfilListSerializer(BaseSerializer):
         read_only_fields = fields
 
 
-class PerfilGetSerializer(PerfilListSerializer):
+class PerfilUsuarioGetSerializer(PerfilUsuarioListSerializer):
     empresa = EmpresaListSerializer()
     owner_id = UsuarioEssentialSerializer()
 
 
-class EmpresaPostSerializer(EmpresaListSerializer):
+class PerfilUsuarioPostSerializer(PerfilUsuarioListSerializer):
     ps_usuario = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
     ps_classificacao = serializers.SlugRelatedField(queryset=ClassificacaoUsuario.objects.all(), slug_field='id', required=True, allow_null=False)
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
     owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
-    class Meta(EmpresaListSerializer.Meta):
-        read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in [
+    class Meta(PerfilUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in PerfilUsuarioListSerializer.Meta.read_only_fields if field not in [
             'ps_usuario',
             'ps_nome',
             'ps_telefone',
@@ -46,3 +46,26 @@ class EmpresaPostSerializer(EmpresaListSerializer):
             'empresa',
             'owner_id'
         ]]
+
+
+class PerfilUsuarioPutPatchSerializer(PerfilUsuarioListSerializer):
+    class Meta(PerfilUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in PerfilUsuarioListSerializer.Meta.read_only_fields if field not in [
+            'ps_nome',
+            'ps_telefone',
+            'ps_celular',
+            'ps_observacoes',
+            'empresa',
+        ]]
+
+
+class PerfilUsuarioClassificarSerializer(PerfilUsuarioListSerializer):
+    ps_classificacao = serializers.SlugRelatedField(queryset=ClassificacaoUsuario.objects.all(), slug_field='id', required=True, allow_null=False)
+
+    class Meta(PerfilUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in PerfilUsuarioListSerializer.Meta.read_only_fields if field not in ['ps_classificacao',]]
+
+
+class PerfilUsuarioAtivarInativarSerializer(PerfilUsuarioListSerializer):
+    class Meta(PerfilUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in PerfilUsuarioListSerializer.Meta.read_only_fields if field not in ['ativo',]]
