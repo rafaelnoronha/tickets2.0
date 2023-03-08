@@ -1,7 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 
 
-class BaseModelViewSet(viewsets.ModelViewSet):
+class EssentialModelViewSet(viewsets.GenericViewSet):
     queryset = None
     serializer_class = None
     serializer_classes = None
@@ -15,3 +15,10 @@ class BaseModelViewSet(viewsets.ModelViewSet):
             return self.serializer_classes.get(self.action, self.serializer_class)
         
         return self.serializer_class
+
+
+class BaseModelViewSet(
+        mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
+        mixins.UpdateModelMixin, mixins.DestroyModelMixin, EssentialModelViewSet
+    ):
+    pass
