@@ -31,10 +31,10 @@ class Parametro(Base):
         db_table = 'tc_parametro'
         verbose_name = 'Parâmetro'
         verbose_name_plural = 'Parâmetros'
-        ordering = ['-id',]
+        ordering = ['-id']
         indexes = [
-            models.Index(fields=['pr_codigo',], name='idx_pr_codigo'),
+            models.Index(fields=['pr_codigo'], name='idx_pr_codigo'),
         ]
         unique_together = [
-            ['pr_codigo', 'empresa'],
+            ['pr_codigo', 'empresa']
         ]

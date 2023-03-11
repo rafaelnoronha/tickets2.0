@@ -1,3 +1,6 @@
+from apps.empresa.filters import rafael
+
+
 lookup_types_string = ['exact', 'iexact', 'contains', 'icontains', 'istartswith', 'iendswith', 'in', 'iregex', ]
 lookup_types_number = ['exact', 'contains', 'gt', 'gte', 'lt', 'lte', 'in', 'range']
 lookup_types_date = [
@@ -34,3 +37,4 @@ lookup_types_base = {
     'hora_alteracao': lookup_types_hours,
     'owner_id': ['exact',],
 }
+lookup_types_base = dict((f'empresa__{key}', value) for (key, value) in rafael.items())
