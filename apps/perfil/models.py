@@ -115,12 +115,12 @@ class PerfilUsuario(Base):
 
     class Meta:
         db_table = 'tc_perfil_usuario'
-        ordering = ['-id',]
+        ordering = ['-id']
         verbose_name = 'Perfil do Usuário'
         verbose_name_plural = 'Perfis dos Usuários'
         indexes = [
-            models.Index(fields=['ps_media_avaliacoes',], name='idx_ps_media_avaliacoes'),
-        ],
+            models.Index(fields=['ps_media_avaliacoes'], name='idx_ps_media_avaliacoes'),
+        ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar um perfil de usuário'),
         )
@@ -148,10 +148,10 @@ class PerfilUsuarioEmpresa(Base):
         db_table = 'tc_perfil_usuario_empresa'
         verbose_name = 'Perfil Usuário Empresa'
         verbose_name_plural = 'Perfis Usuário Empresa'
-        ordering = ['-id',]
+        ordering = ['-id']
         unique_together = ['pm_perfil', 'empresa']
         indexes = [
-            models.Index(fields=['pm_perfil',], name='idx_pm_perfil'),
+            models.Index(fields=['pm_perfil'], name='idx_pm_perfil'),
         ]
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar um perfil de usuário para a empresa'),
