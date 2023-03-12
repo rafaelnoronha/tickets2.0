@@ -13,5 +13,5 @@ class BaseSerializer(serializers.ModelSerializer):
             'hora_criacao',
             'data_alteracao',
             'hora_alteracao',
-            'owner_id'
+            'owner'
         ]

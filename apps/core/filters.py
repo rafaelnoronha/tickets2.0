@@ -1,6 +1,3 @@
-from apps.empresa.filters import rafael
-
-
 lookup_types_string = ['exact', 'iexact', 'contains', 'icontains', 'istartswith', 'iendswith', 'in', 'iregex', ]
 lookup_types_number = ['exact', 'contains', 'gt', 'gte', 'lt', 'lte', 'in', 'range']
 lookup_types_date = [
@@ -30,11 +27,33 @@ lookup_types_hours = [
 
 lookup_types_base = {
     'ativo': lookup_types_string,
+
     'empresa': ['exact',],
+    'empresa__mp_cpf_cnpj': lookup_types_string,
+    'empresa__mp_razao_social': lookup_types_string,
+    'empresa__mp_nome_fantasia': lookup_types_string,
+    'empresa__mp_logradouro': lookup_types_string,
+    'empresa__mp_numero': lookup_types_string,
+    'empresa__mp_complemento': lookup_types_string,
+    'empresa__mp_bairro': lookup_types_string,
+    'empresa__mp_municipio': lookup_types_string,
+    'empresa__mp_uf': lookup_types_string,
+    'empresa__mp_cep': lookup_types_string,
+    'empresa__mp_pais': lookup_types_string,
+    'empresa__mp_telefone': lookup_types_string,
+    'empresa__mp_media_avaliacoes': lookup_types_number,
+    'empresa__mp_prestadora_servico': lookup_types_string,
+
     'data_criacao': lookup_types_date,
     'hora_criacao': lookup_types_hours,
     'data_alteracao': lookup_types_date,
     'hora_alteracao': lookup_types_hours,
-    'owner_id': ['exact',],
+
+    'owner': ['exact',],
+    'owner__username': lookup_types_string,
+    'owner__email': lookup_types_string,
+    'owner__is_active': ['exact',],
+    'owner__is_superuser': ['exact',],
+    'owner__is_staff': ['exact',],
+    'owner__is_manager': ['exact',]
 }
-lookup_types_base = dict((f'empresa__{key}', value) for (key, value) in rafael.items())

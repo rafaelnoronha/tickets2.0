@@ -23,12 +23,12 @@ class ParametroListSerializer(BaseSerializer):
 
 class ParametroGetSerializer(ParametroListSerializer):
     empresa = EmpresaListSerializer()
-    owner_id = UsuarioEssentialSerializer()
+    owner = UsuarioEssentialSerializer()
 
 
 class ParametroPostSerializer(ParametroListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(ParametroListSerializer.Meta):
         read_only_fields = [field for field in ParametroListSerializer.Meta.read_only_fields if field not in [
@@ -36,7 +36,7 @@ class ParametroPostSerializer(ParametroListSerializer):
             'pr_descricao',
             'pr_valor',
             'empresa',
-            'owner_id'
+            'owner'
         ]]
 
 

@@ -26,14 +26,14 @@ class PerfilUsuarioListSerializer(BaseSerializer):
 
 class PerfilUsuarioGetSerializer(PerfilUsuarioListSerializer):
     empresa = EmpresaListSerializer()
-    owner_id = UsuarioEssentialSerializer()
+    owner = UsuarioEssentialSerializer()
 
 
 class PerfilUsuarioPostSerializer(PerfilUsuarioListSerializer):
     ps_usuario = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
     ps_classificacao = serializers.SlugRelatedField(queryset=ClassificacaoPerfil.objects.all(), slug_field='id', required=True, allow_null=False)
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(PerfilUsuarioListSerializer.Meta):
         read_only_fields = [field for field in PerfilUsuarioListSerializer.Meta.read_only_fields if field not in [
@@ -44,7 +44,7 @@ class PerfilUsuarioPostSerializer(PerfilUsuarioListSerializer):
             'ps_classificacao',
             'ps_observacoes',
             'empresa',
-            'owner_id'
+            'owner'
         ]]
 
 
@@ -83,19 +83,19 @@ class PerfilUsuarioEmpresaListSerializer(BaseSerializer):
 
 class PerfilUsuarioEmpresaGetSerializer(PerfilUsuarioEmpresaListSerializer):
     empresa = EmpresaListSerializer()
-    owner_id = UsuarioEssentialSerializer()
+    owner = UsuarioEssentialSerializer()
 
 
 class PerfilUsuarioEmpresaPostSerializer(PerfilUsuarioEmpresaListSerializer):
     pm_perfil = serializers.SlugRelatedField(queryset=PerfilUsuarioEmpresa.objects.all(), slug_field='id', required=True, allow_null=False)
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=True, allow_null=False)
-    owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(PerfilUsuarioEmpresaListSerializer.Meta):
         read_only_fields = [field for field in PerfilUsuarioEmpresaListSerializer.Meta.read_only_fields if field not in [
             'pm_perfil',
             'empresa',
-            'owner_id'
+            'owner'
         ]]
 
 
@@ -118,12 +118,12 @@ class ClassificacaoPerfilListSerializer(BaseSerializer):
 
 class ClassificacaoPerfilGetSerializer(ClassificacaoPerfilListSerializer):
     empresa = EmpresaListSerializer()
-    owner_id = UsuarioEssentialSerializer()
+    owner = UsuarioEssentialSerializer()
 
 
 class ClassificacaoPerfilPostSerializer(ClassificacaoPerfilListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(ClassificacaoPerfilListSerializer.Meta):
         read_only_fields = [field for field in ClassificacaoPerfilListSerializer.Meta.read_only_fields if field not in [
@@ -131,7 +131,7 @@ class ClassificacaoPerfilPostSerializer(ClassificacaoPerfilListSerializer):
             'cp_nome',
             'cp_descricao',
             'empresa',
-            'owner_id'
+            'owner'
         ]]
 
 

@@ -32,12 +32,12 @@ class EmpresaListSerializer(BaseSerializer):
 
 class EmpresaGetSerializer(EmpresaListSerializer):
     empresa = EmpresaListSerializer()
-    owner_id = UsuarioEssentialSerializer()
+    owner = UsuarioEssentialSerializer()
 
 
 class EmpresaPostSerializer(EmpresaListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner_id = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(EmpresaListSerializer.Meta):
         read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in [
@@ -55,7 +55,7 @@ class EmpresaPostSerializer(EmpresaListSerializer):
             'mp_telefone',
             'mp_prestadora_servico',
             'empresa',
-            'owner_id'
+            'owner'
         ]]
 
 

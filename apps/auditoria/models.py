@@ -37,7 +37,7 @@ class LogAutenticacao(Base):
 
     ativo = None
     empresa = None
-    owner_id = None
+    owner = None
 
 
     class Meta:

@@ -84,12 +84,12 @@ class Base(models.Model):
         help_text='Hora da alteração do registro'
     )
 
-    owner_id = models.ForeignKey(
+    owner = models.ForeignKey(
         'usuario.Usuario',
-        verbose_name='Owner Id',
+        verbose_name='Owner',
         on_delete=models.PROTECT,
         null=True,
-        help_text='Para qual empresa o parâmetro será usado',
+        help_text='Usuário proprietário do registro, que criou o registro',
     )
 
     

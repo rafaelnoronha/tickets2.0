@@ -49,7 +49,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'hora_criacao',
             'data_alteracao',
             'hora_alteracao',
-            'owner_id'
+            'owner'
         ]
         read_only_fields = fields.copy()
 
@@ -64,7 +64,7 @@ class UsuarioListSerializer(UsuarioSerializer):
             'is_superuser',
             'is_manager',
             'last_login',
-            'owner_id'
+            'owner'
         ]
 
 
