@@ -31,3 +31,11 @@ class DesbloquearPermission(BasePermission):
             return True
 
         return False
+    
+
+class ClassificacaoUsuarioAtivarInativarPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.has_perms(['usuario.ativar_inativar',]):
+            return True
+
+        return False

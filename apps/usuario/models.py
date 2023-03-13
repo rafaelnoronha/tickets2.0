@@ -2,8 +2,51 @@ from django.db import models
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from apps.core.models import Base
+from apps.core.validators import TelefoneValidator, CelularValidator
+
+
+class ClassificacaoUsuario(Base):
+    """
+    Modelo da classificação dos usuários.
+    """
+
+    cs_codigo = models.CharField(
+        verbose_name='Código',
+        max_length=20,
+        unique=True,
+        help_text='Código da Classificação',
+    )
+
+    cs_nome = models.CharField(
+        verbose_name='Nome',
+        max_length=50,
+        help_text='Nome da classificação',
+    )
+
+    cs_descricao = models.TextField(
+        verbose_name='descricao',
+        blank=True,
+        help_text='Descrição da classificação',
+    )
+
+
+    class Meta:
+        ordering = ['-id']
+        db_table = 'tc_classificacao_usuario'
+        verbose_name = 'Classificação do Usuário'
+        verbose_name_plural = 'Classificações do Usuário'
+        indexes = [
+            models.Index(fields=['cs_codigo'], name='idx_cs_codigo'),
+        ]
+        permissions = (
+            ('ativar_inativar', 'Permite ativar ou inativar a classificação de usuário'),
+        )
+
+    def __str__(self):
+        return str(self.id)
 
 
 class UserManagerCustom(UserManager):
@@ -75,6 +118,75 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         help_text='Informa se o usuário é um gerente',
     )
 
+    sr_nome = models.CharField(
+        verbose_name='Nome',
+        max_length=150,
+        help_text='Nome do usuário',
+    )
+
+    sr_telefone = models.CharField(
+        verbose_name='Telefone',
+        max_length=10,
+        blank=True,
+        validators=[
+            TelefoneValidator()
+        ],
+        help_text='Telefone fixo ex: 3100000000',
+    )
+
+    sr_celular = models.CharField(
+        verbose_name='Celular',
+        max_length=11,
+        blank=True,
+        validators=[
+            CelularValidator()
+        ],
+        help_text='Telefone celular ex: 31900000000',
+    )
+
+    sr_classificacao = models.ForeignKey(
+        ClassificacaoUsuario,
+        verbose_name='Classificação',
+        related_name='rl_sr_classificacao',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        help_text='Informa a classificação do usuário'
+    )
+
+    sr_media_avaliacoes = models.FloatField(
+        verbose_name='Média das avaliações',
+        default=0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ],
+        help_text='Média das avaliações dos chamados',
+    )
+
+    sr_observacoes = models.CharField(
+        verbose_name='Observações',
+        max_length=4000,
+        blank=True,
+        help_text='Observações referênte ao usuário',
+    )
+
+
+    class Meta:
+        db_table = 'tc_perfil_usuario'
+        ordering = ['-id']
+        verbose_name = 'Perfil do Usuário'
+        verbose_name_plural = 'Perfis dos Usuários'
+        indexes = [
+            models.Index(fields=['ps_media_avaliacoes'], name='idx_ps_media_avaliacoes'),
+        ]
+        permissions = (
+            ('ativar_inativar', 'Permite ativar ou inativar um perfil de usuário'),
+        )
+
+    def __str__(self):
+        return str(self.id)
+
     empresa = None
     ativo = None
 
@@ -98,8 +210,9 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar um usuário'),
             ('desbloquear', 'Permite desbloquear um usuário bloqueado por errar a senha x vezes'),
-            ('transformar_admin', 'Permite transformar um usuário em administrador ou não'),
-            ('transformar_gerente', 'Permite transformar um usuário em gerente ou não'),
+            ('transformar_admin', 'Permite transformar um usuário em administrador'),
+            ('transformar_gerente', 'Permite transformar um usuário em gerente'),
+            ('classificar', 'Permite classificar um usuário'),
         )
 
     def __str__(self):

@@ -15,11 +15,11 @@ from jwt import encode as jwt_encode, decode as jwt_decode
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
 
-from .models import Usuario
-from .filters import UsuarioFilterSet
+from .models import Usuario, ClassificacaoUsuario
+from .filters import UsuarioFilterSet, ClassificacaoUsuarioFilterSet
 from .permissions import (
     AtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
-    TransformaGerentePermission
+    TransformaGerentePermission, ClassificacaoUsuarioAtivarInativarPermission
 )
 from .serializers import (
     UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
@@ -27,7 +27,8 @@ from .serializers import (
     UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer,
     UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioSerializer,
     GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate, GrupoPermissoesUsuarioSerializerRetrieve,
-    PermissaoUsuarioSerializer
+    PermissaoUsuarioSerializer, ClassificacaoUsuarioListSerializer, ClassificacaoUsuarioPostSerializer,
+    ClassificacaoUsuarioGetSerializer, ClassificacaoUsuarioPutPatchSerializer, ClassificacaoUsuarioAtivarInativarSerializer
 )
 from apps.core.permissions import BasePemission
 from apps.core.decorators import action_ativar_inativar
@@ -206,6 +207,24 @@ class UsuarioViewSet(BaseModelViewSet):
         serializer = UsuarioSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+@action_ativar_inativar
+class ClassificacaoUsuarioViewSet(BaseModelViewSet):
+    permission_classes = (BasePemission, )
+    queryset = ClassificacaoUsuario.objects.all()
+    filterset_class = ClassificacaoUsuarioFilterSet
+    serializer_class = ClassificacaoUsuarioListSerializer
+    serializer_classes = {
+        'retrieve': ClassificacaoUsuarioGetSerializer,
+        'create': ClassificacaoUsuarioPostSerializer,
+        'update': ClassificacaoUsuarioPutPatchSerializer,
+        'partial_update': ClassificacaoUsuarioPutPatchSerializer,
+    }
+    action_ativar_inativar = {
+        'permission': ClassificacaoUsuarioAtivarInativarPermission,
+        'serializer': ClassificacaoUsuarioAtivarInativarSerializer,
+    }
 
 
 class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):

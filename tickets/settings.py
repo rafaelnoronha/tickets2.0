@@ -56,7 +56,6 @@ MY_APPS = [
     'apps.parametro',
     'apps.auditoria',
     'apps.lgpd',
-    'apps.perfil',
     'apps.ticket',
 ]
 

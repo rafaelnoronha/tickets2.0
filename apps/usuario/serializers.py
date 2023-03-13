@@ -9,8 +9,11 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.serializers import TokenObtainSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Usuario
+from .models import Usuario, ClassificacaoUsuario
 from apps.auditoria.models import LogAutenticacao
+from apps.core.serializers import BaseSerializer
+from apps.empresa.models import Empresa
+from apps.empresa.serializers import EmpresaListSerializer
 
 
 class UsuarioEssentialSerializer(serializers.ModelSerializer):
@@ -22,6 +25,51 @@ class UsuarioEssentialSerializer(serializers.ModelSerializer):
             'email'
         ]
         read_only_fields = fields
+
+
+class ClassificacaoUsuarioListSerializer(BaseSerializer):
+    class Meta:
+        model = ClassificacaoUsuario
+        fields = [
+            'cp_codigo',
+            'cp_nome',
+            'cp_descricao',
+        ]
+        fields += BaseSerializer.Meta.fields
+        read_only_fields = fields
+
+
+class ClassificacaoUsuarioGetSerializer(ClassificacaoUsuarioListSerializer):
+    empresa = EmpresaListSerializer()
+    owner = UsuarioEssentialSerializer()
+
+
+class ClassificacaoUsuarioPostSerializer(ClassificacaoUsuarioListSerializer):
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
+    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+
+    class Meta(ClassificacaoUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in ClassificacaoUsuarioListSerializer.Meta.read_only_fields if field not in [
+            'cp_codigo',
+            'cp_nome',
+            'cp_descricao',
+            'empresa',
+            'owner'
+        ]]
+
+
+class ClassificacaoUsuarioPutPatchSerializer(ClassificacaoUsuarioListSerializer):
+    class Meta(ClassificacaoUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in ClassificacaoUsuarioListSerializer.Meta.read_only_fields if field not in [
+            'cp_nome',
+            'cp_descricao',
+            'empresa',
+        ]]
+
+
+class ClassificacaoUsuarioAtivarInativarSerializer(ClassificacaoUsuarioListSerializer):
+    class Meta(ClassificacaoUsuarioListSerializer.Meta):
+        read_only_fields = [field for field in ClassificacaoUsuarioListSerializer.Meta.read_only_fields if field not in ['ativo',]]
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -45,6 +93,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'is_manager',
             'authentication_failures',
             'last_login',
+            'sr_nome',
+            'sr_telefone',
+            'sr_celular',
+            'sr_classificacao',
+            'sr_media_avaliacoes',
+            'sr_observacoes',
             'data_criacao',
             'hora_criacao',
             'data_alteracao',
@@ -63,6 +117,11 @@ class UsuarioListSerializer(UsuarioSerializer):
             'is_active',
             'is_superuser',
             'is_manager',
+            'sr_nome',
+            'sr_telefone',
+            'sr_celular',
+            'sr_classificacao',
+            'sr_media_avaliacoes',
             'last_login',
             'owner'
         ]
@@ -72,7 +131,13 @@ class UsuarioPutPathSerializer(UsuarioSerializer):
     groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='id', many=True, required=True)
 
     class Meta(UsuarioSerializer.Meta):
-        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in ['email', 'groups']]
+        read_only_fields = [field for field in UsuarioSerializer.Meta.read_only_fields if field not in [
+            'email',
+            'groups',
+            'sr_nome',
+            'sr_telefone',
+            'sr_celular',
+        ]]
 
 
 class UsuarioPostSerializer(UsuarioSerializer):
@@ -85,7 +150,10 @@ class UsuarioPostSerializer(UsuarioSerializer):
             'email',
             'password',
             'is_staff',
-            'groups'
+            'groups',
+            'sr_nome',
+            'sr_telefone',
+            'sr_celular',
         ]]
 
 
