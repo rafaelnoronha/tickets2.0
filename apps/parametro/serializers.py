@@ -3,9 +3,8 @@ from rest_framework import serializers
 from .models import Parametro
 from apps.core.serializers import BaseSerializer
 from apps.usuario.models import Usuario
-from apps.usuario.serializers import UsuarioEssentialSerializer
 from apps.empresa.models import Empresa
-from apps.empresa.serializers import EmpresaListSerializer
+from apps.core.serializers import BaseEmpresaSerializer
 
 
 class ParametroListSerializer(BaseSerializer):
@@ -22,13 +21,11 @@ class ParametroListSerializer(BaseSerializer):
 
 
 class ParametroGetSerializer(ParametroListSerializer):
-    empresa = EmpresaListSerializer()
-    owner = UsuarioEssentialSerializer()
+    empresa = BaseEmpresaSerializer()
 
 
 class ParametroPostSerializer(ParametroListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(ParametroListSerializer.Meta):
         read_only_fields = [field for field in ParametroListSerializer.Meta.read_only_fields if field not in [
@@ -36,7 +33,6 @@ class ParametroPostSerializer(ParametroListSerializer):
             'pr_descricao',
             'pr_valor',
             'empresa',
-            'owner'
         ]]
 
 

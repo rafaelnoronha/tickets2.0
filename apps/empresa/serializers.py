@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from .models import Empresa
 from apps.core.serializers import BaseSerializer
-from apps.usuario.serializers import UsuarioEssentialSerializer
+from apps.core.serializers import BaseEmpresaSerializer
 from apps.usuario.models import Usuario
 
 
@@ -31,13 +31,11 @@ class EmpresaListSerializer(BaseSerializer):
 
 
 class EmpresaGetSerializer(EmpresaListSerializer):
-    empresa = EmpresaListSerializer()
-    owner = UsuarioEssentialSerializer()
+    empresa = BaseEmpresaSerializer()
 
 
 class EmpresaPostSerializer(EmpresaListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(EmpresaListSerializer.Meta):
         read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in [
@@ -55,7 +53,6 @@ class EmpresaPostSerializer(EmpresaListSerializer):
             'mp_telefone',
             'mp_prestadora_servico',
             'empresa',
-            'owner'
         ]]
 
 

@@ -9,22 +9,11 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.serializers import TokenObtainSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Usuario, ClassificacaoUsuario
+from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
 from apps.auditoria.models import LogAutenticacao
 from apps.core.serializers import BaseSerializer
 from apps.empresa.models import Empresa
-from apps.empresa.serializers import EmpresaListSerializer
-
-
-class UsuarioEssentialSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Usuario
-        fields = [
-            'id',
-            'username',
-            'email'
-        ]
-        read_only_fields = fields
+from apps.empresa.serializers import BaseEmpresaSerializer
 
 
 class ClassificacaoUsuarioListSerializer(BaseSerializer):
@@ -40,13 +29,11 @@ class ClassificacaoUsuarioListSerializer(BaseSerializer):
 
 
 class ClassificacaoUsuarioGetSerializer(ClassificacaoUsuarioListSerializer):
-    empresa = EmpresaListSerializer()
-    owner = UsuarioEssentialSerializer()
+    empresa = BaseEmpresaSerializer()
 
 
 class ClassificacaoUsuarioPostSerializer(ClassificacaoUsuarioListSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
-    owner = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
 
     class Meta(ClassificacaoUsuarioListSerializer.Meta):
         read_only_fields = [field for field in ClassificacaoUsuarioListSerializer.Meta.read_only_fields if field not in [
@@ -54,7 +41,6 @@ class ClassificacaoUsuarioPostSerializer(ClassificacaoUsuarioListSerializer):
             'cp_nome',
             'cp_descricao',
             'empresa',
-            'owner'
         ]]
 
 
@@ -103,7 +89,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'hora_criacao',
             'data_alteracao',
             'hora_alteracao',
-            'owner'
         ]
         read_only_fields = fields.copy()
 
@@ -123,7 +108,6 @@ class UsuarioListSerializer(UsuarioSerializer):
             'sr_classificacao',
             'sr_media_avaliacoes',
             'last_login',
-            'owner'
         ]
 
 
@@ -245,6 +229,37 @@ class UsuarioAlterarSenhaSerializer(serializers.Serializer):
             'new_password',
             'new_password_confirmation'
         ]
+
+
+class UsuarioEmpresaListSerializer(BaseSerializer):
+    class Meta:
+        model = UsuarioEmpresa
+        fields = [
+            'sm_usuario',
+        ]
+        fields += BaseSerializer.Meta.fields
+        read_only_fields = fields
+
+
+class UsuarioEmpresaGetSerializer(UsuarioEmpresaListSerializer):
+    sm_usuario = UsuarioListSerializer()
+    empresa = BaseEmpresaSerializer()
+
+
+class UsuarioEmpresaPostSerializer(UsuarioEmpresaListSerializer):
+    sm_usuario = serializers.SlugRelatedField(queryset=Usuario.objects.all(), slug_field='id', required=True, allow_null=False)
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=True, allow_null=False)
+
+    class Meta(UsuarioEmpresaListSerializer.Meta):
+        read_only_fields = [field for field in UsuarioEmpresaListSerializer.Meta.read_only_fields if field not in [
+            'sm_usuario',
+            'empresa',
+        ]]
+
+
+class UsuarioEmpresaAtivarInativarSerializer(UsuarioEmpresaListSerializer):
+    class Meta(UsuarioEmpresaListSerializer.Meta):
+        read_only_fields = [field for field in UsuarioEmpresaListSerializer.Meta.read_only_fields if field not in ['ativo',]]
 
 
 class PermissaoUsuarioSerializer(serializers.ModelSerializer):

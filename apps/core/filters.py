@@ -48,12 +48,4 @@ lookup_types_base = {
     'hora_criacao': lookup_types_hours,
     'data_alteracao': lookup_types_date,
     'hora_alteracao': lookup_types_hours,
-
-    'owner': ['exact',],
-    'owner__username': lookup_types_string,
-    'owner__email': lookup_types_string,
-    'owner__is_active': ['exact',],
-    'owner__is_superuser': ['exact',],
-    'owner__is_staff': ['exact',],
-    'owner__is_manager': ['exact',]
 }

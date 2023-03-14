@@ -32,6 +32,30 @@ class ClassificacaoUsuario(Base):
         help_text='Descrição da classificação',
     )
 
+    data_criacao = models.DateField(
+        verbose_name='Data de Criação',
+        auto_now_add=True,
+        help_text='Data da criação do registro'
+    )
+
+    hora_criacao = models.TimeField(
+        verbose_name='Hora de Criação',
+        auto_now_add=True,
+        help_text='Hora da criação do registro'
+    )
+
+    data_alteracao = models.DateField(
+        verbose_name='Data da Alteração',
+        auto_now=True,
+        help_text='Data da alteração do registro'
+    )
+
+    hora_alteracao = models.TimeField(
+        verbose_name='Hora da Alteração',
+        auto_now=True,
+        help_text='Hora da alteração do registro'
+    )
+
 
     class Meta:
         ordering = ['-id']
@@ -63,7 +87,7 @@ class UserManagerCustom(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class Usuario(Base, AbstractBaseUser, PermissionsMixin):
+class Usuario(AbstractBaseUser, PermissionsMixin):
     """
     Modelo que armazena os dados de autenticação dos usuários(clientes e prestadores de serviço).
     """
@@ -171,6 +195,30 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
         help_text='Observações referênte ao usuário',
     )
 
+    data_criacao = models.DateField(
+        verbose_name='Data de Criação',
+        auto_now_add=True,
+        help_text='Data da criação do registro'
+    )
+
+    hora_criacao = models.TimeField(
+        verbose_name='Hora de Criação',
+        auto_now_add=True,
+        help_text='Hora da criação do registro'
+    )
+
+    data_alteracao = models.DateField(
+        verbose_name='Data da Alteração',
+        auto_now=True,
+        help_text='Data da alteração do registro'
+    )
+
+    hora_alteracao = models.TimeField(
+        verbose_name='Hora da Alteração',
+        auto_now=True,
+        help_text='Hora da alteração do registro'
+    )
+
 
     class Meta:
         db_table = 'tc_perfil_usuario'
@@ -187,8 +235,6 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return str(self.id)
 
-    empresa = None
-    ativo = None
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
@@ -213,6 +259,33 @@ class Usuario(Base, AbstractBaseUser, PermissionsMixin):
             ('transformar_admin', 'Permite transformar um usuário em administrador'),
             ('transformar_gerente', 'Permite transformar um usuário em gerente'),
             ('classificar', 'Permite classificar um usuário'),
+        )
+
+    def __str__(self):
+        return str(self.id)
+    
+
+class UsuarioEmpresa(Base):
+    """
+    Modelo que une um usuário à uma empresa.
+    """
+
+    sm_usuario = models.ForeignKey(
+        Usuario,
+        verbose_name='Usuário',
+        related_name='rl_sm_usuario',
+        on_delete=models.CASCADE,
+        help_text='Usuário que terá acesso a uma determinada empresa'
+    )
+
+
+    class Meta:
+        ordering = ['-id']
+        db_table = 'tc_usuario_empresa'
+        verbose_name = 'Usuário Empresa'
+        verbose_name_plural = 'Usuários Empresa'
+        permissions = (
+            ('ativar_inativar', 'Permite ativar ou inativar o acesso de um usuário a uma empresa'),
         )
 
     def __str__(self):

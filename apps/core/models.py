@@ -84,14 +84,6 @@ class Base(models.Model):
         help_text='Hora da alteração do registro'
     )
 
-    owner = models.ForeignKey(
-        'usuario.Usuario',
-        verbose_name='Owner',
-        on_delete=models.PROTECT,
-        null=True,
-        help_text='Usuário proprietário do registro, que criou o registro',
-    )
-
     
     class Meta:
         abstract = True

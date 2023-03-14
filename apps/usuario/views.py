@@ -15,11 +15,11 @@ from jwt import encode as jwt_encode, decode as jwt_decode
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
 
-from .models import Usuario, ClassificacaoUsuario
+from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
 from .filters import UsuarioFilterSet, ClassificacaoUsuarioFilterSet
 from .permissions import (
-    AtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
-    TransformaGerentePermission, ClassificacaoUsuarioAtivarInativarPermission
+    UsuarioAtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
+    TransformaGerentePermission, ClassificacaoUsuarioAtivarInativarPermission, UsuarioEmpresaAtivarInativarPermission
 )
 from .serializers import (
     UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
@@ -28,11 +28,13 @@ from .serializers import (
     UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioSerializer,
     GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate, GrupoPermissoesUsuarioSerializerRetrieve,
     PermissaoUsuarioSerializer, ClassificacaoUsuarioListSerializer, ClassificacaoUsuarioPostSerializer,
-    ClassificacaoUsuarioGetSerializer, ClassificacaoUsuarioPutPatchSerializer, ClassificacaoUsuarioAtivarInativarSerializer
+    ClassificacaoUsuarioGetSerializer, ClassificacaoUsuarioPutPatchSerializer, ClassificacaoUsuarioAtivarInativarSerializer,
+    UsuarioEmpresaListSerializer, UsuarioEmpresaPostSerializer, UsuarioEmpresaGetSerializer,
+    UsuarioEmpresaAtivarInativarSerializer
 )
 from apps.core.permissions import BasePemission
 from apps.core.decorators import action_ativar_inativar
-from apps.core.views import BaseModelViewSet
+from apps.core.views import BaseModelViewSet, EssentialModelViewSet
 from apps.core.email import EmailHTML
 
 
@@ -49,7 +51,7 @@ class UsuarioViewSet(BaseModelViewSet):
         'partial_update': UsuarioPutPathSerializer,
     }
     action_ativar_inativar = {
-        'permission': AtivarInativarPermission,
+        'permission': UsuarioAtivarInativarPermission,
         'serializer': UsuarioAtivarInativarSerializer,
     }
 
@@ -224,6 +226,25 @@ class ClassificacaoUsuarioViewSet(BaseModelViewSet):
     action_ativar_inativar = {
         'permission': ClassificacaoUsuarioAtivarInativarPermission,
         'serializer': ClassificacaoUsuarioAtivarInativarSerializer,
+    }
+
+
+@action_ativar_inativar
+class UsuarioEmpresaViewSet(
+        mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin,
+        mixins.DestroyModelMixin, EssentialModelViewSet
+    ):
+    permission_classes = (BasePemission, )
+    queryset = UsuarioEmpresa.objects.all()
+    filterset_class = ClassificacaoUsuarioFilterSet
+    serializer_class = UsuarioEmpresaListSerializer
+    serializer_classes = {
+        'retrieve': UsuarioEmpresaGetSerializer,
+        'create': UsuarioEmpresaPostSerializer,
+    }
+    action_ativar_inativar = {
+        'permission': UsuarioEmpresaAtivarInativarPermission,
+        'serializer': UsuarioEmpresaAtivarInativarSerializer,
     }
 
 

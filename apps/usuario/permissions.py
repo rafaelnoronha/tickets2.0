@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class AtivarInativarPermission(BasePermission):
+class UsuarioAtivarInativarPermission(BasePermission):
     def has_permission(self, request, view):
         if request.user.has_perms(['usuario.ativar_inativar',]):
             return True
@@ -34,6 +34,14 @@ class DesbloquearPermission(BasePermission):
     
 
 class ClassificacaoUsuarioAtivarInativarPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.has_perms(['usuario.ativar_inativar',]):
+            return True
+
+        return False
+    
+
+class UsuarioEmpresaAtivarInativarPermission(BasePermission):
     def has_permission(self, request, view):
         if request.user.has_perms(['usuario.ativar_inativar',]):
             return True
