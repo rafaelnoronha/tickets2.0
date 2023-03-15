@@ -1,6 +1,9 @@
 from rest_framework.routers import SimpleRouter
 
-from .views import UsuarioViewSet, GrupoPermissoesUsuarioViewSet, PermissaoUsuarioViewSet, ClassificacaoUsuarioViewSet
+from .views import (
+    UsuarioViewSet, GrupoPermissoesUsuarioViewSet, PermissaoUsuarioViewSet,
+    ClassificacaoUsuarioViewSet, UsuarioEmpresaViewSet
+)
 
 
 usuario_router = SimpleRouter()
@@ -14,3 +17,6 @@ router_permissao_usuario.register('', PermissaoUsuarioViewSet)
 
 classificacao_usuario_router = SimpleRouter()
 classificacao_usuario_router.register('', ClassificacaoUsuarioViewSet)
+
+usuario_empresa_router = SimpleRouter()
+usuario_empresa_router.register('', UsuarioEmpresaViewSet)

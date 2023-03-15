@@ -1,6 +1,6 @@
 import django_filters
 
-from .models import Usuario, ClassificacaoUsuario
+from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
 from apps.core.filters import lookup_types_string, lookup_types_base, lookup_types_number
 
 
@@ -33,3 +33,12 @@ class UsuarioFilterSet(django_filters.FilterSet):
             'is_manager': ['exact',]
         }
         fields.update([(f'sr_classificacao__{chave}', valor) for chave, valor in ClassificacaoUsuarioFilterSet.Meta.fields.items()])
+
+
+class UsuarioEmpresaFilterSet(django_filters.FilterSet):
+    class Meta:
+        model = UsuarioEmpresa
+        fields = {
+            'sm_usuario': ['exact'],
+        }
+        fields.update([(f'sm_usuario__{chave}', valor) for chave, valor in UsuarioFilterSet.Meta.fields.items()])

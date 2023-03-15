@@ -16,7 +16,7 @@ from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 import uuid
 
 from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
-from .filters import UsuarioFilterSet, ClassificacaoUsuarioFilterSet
+from .filters import UsuarioFilterSet, ClassificacaoUsuarioFilterSet, UsuarioEmpresaFilterSet
 from .permissions import (
     UsuarioAtivarInativarPermission, DesbloquearPermission, TransformaAdminPermission,
     TransformaGerentePermission, ClassificacaoUsuarioAtivarInativarPermission, UsuarioEmpresaAtivarInativarPermission
@@ -236,7 +236,7 @@ class UsuarioEmpresaViewSet(
     ):
     permission_classes = (BasePemission, )
     queryset = UsuarioEmpresa.objects.all()
-    filterset_class = ClassificacaoUsuarioFilterSet
+    filterset_class = UsuarioEmpresaFilterSet
     serializer_class = UsuarioEmpresaListSerializer
     serializer_classes = {
         'retrieve': UsuarioEmpresaGetSerializer,

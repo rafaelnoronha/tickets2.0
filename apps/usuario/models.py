@@ -145,6 +145,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     sr_nome = models.CharField(
         verbose_name='Nome',
         max_length=150,
+        blank=True,
         help_text='Nome do usuário',
     )
 
