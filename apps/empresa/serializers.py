@@ -3,10 +3,11 @@ from rest_framework import serializers
 from .models import Empresa
 from apps.core.serializers import BaseSerializer
 from apps.core.serializers import BaseEmpresaSerializer
-from apps.usuario.models import Usuario
 
 
-class EmpresaListSerializer(BaseSerializer):
+class EmpresaGetSerializer(BaseSerializer):
+    empresa = BaseEmpresaSerializer()
+
     class Meta:
         model = Empresa
         fields = [
@@ -30,15 +31,15 @@ class EmpresaListSerializer(BaseSerializer):
         read_only_fields = fields
 
 
-class EmpresaGetSerializer(EmpresaListSerializer):
-    empresa = BaseEmpresaSerializer()
+class EmpresaListSerializer(EmpresaGetSerializer):
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id')
 
 
-class EmpresaPostSerializer(EmpresaListSerializer):
+class EmpresaPostSerializer(EmpresaGetSerializer):
     empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
 
-    class Meta(EmpresaListSerializer.Meta):
-        read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in [
+    class Meta(EmpresaGetSerializer.Meta):
+        read_only_fields = [field for field in EmpresaGetSerializer.Meta.read_only_fields if field not in [
             'mp_cpf_cnpj',
             'mp_razao_social',
             'mp_nome_fantasia',
@@ -56,9 +57,11 @@ class EmpresaPostSerializer(EmpresaListSerializer):
         ]]
 
 
-class EmpresaPutPatchSerializer(EmpresaListSerializer):
-    class Meta(EmpresaListSerializer.Meta):
-        read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in [
+class EmpresaPutPatchSerializer(EmpresaGetSerializer):
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.filter(ativo='S'), slug_field='id', required=False, allow_null=True)
+
+    class Meta(EmpresaGetSerializer.Meta):
+        read_only_fields = [field for field in EmpresaGetSerializer.Meta.read_only_fields if field not in [
             'mp_cpf_cnpj',
             'mp_razao_social',
             'mp_nome_fantasia',
@@ -75,6 +78,6 @@ class EmpresaPutPatchSerializer(EmpresaListSerializer):
         ]]
 
 
-class EmpresaAtivarInativarSerializer(EmpresaListSerializer):
-    class Meta(EmpresaListSerializer.Meta):
-        read_only_fields = [field for field in EmpresaListSerializer.Meta.read_only_fields if field not in ['ativo',]]
+class EmpresaAtivarInativarSerializer(EmpresaGetSerializer):
+    class Meta(EmpresaGetSerializer.Meta):
+        read_only_fields = [field for field in EmpresaGetSerializer.Meta.read_only_fields if field not in ['ativo',]]

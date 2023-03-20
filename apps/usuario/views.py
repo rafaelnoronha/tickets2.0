@@ -22,12 +22,12 @@ from .permissions import (
     TransformaGerentePermission, ClassificacaoUsuarioAtivarInativarPermission, UsuarioEmpresaAtivarInativarPermission
 )
 from .serializers import (
-    UsuarioSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
+    UsuarioGetSerializer, UsuarioListSerializer, UsuarioPutPathSerializer,
     UsuarioPostSerializer, ObterParTokensSerializer, UsuarioRedefinirSenhaSerializer,
-    UsuarioAlterarSenhaSerializer, UsuarioSerializer, UsuarioAtivarInativarSerializer,
-    UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioSerializer,
-    GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate, GrupoPermissoesUsuarioSerializerRetrieve,
-    PermissaoUsuarioSerializer, ClassificacaoUsuarioListSerializer, ClassificacaoUsuarioPostSerializer,
+    UsuarioAlterarSenhaSerializer, UsuarioAtivarInativarSerializer,
+    UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioGetSerializer,
+    GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer, GrupoPermissoesUsuarioRetrieveSerializer,
+    PermissaoUsuarioGetSerializer, ClassificacaoUsuarioListSerializer, ClassificacaoUsuarioPostSerializer,
     ClassificacaoUsuarioGetSerializer, ClassificacaoUsuarioPutPatchSerializer, ClassificacaoUsuarioAtivarInativarSerializer,
     UsuarioEmpresaListSerializer, UsuarioEmpresaPostSerializer, UsuarioEmpresaGetSerializer,
     UsuarioEmpresaAtivarInativarSerializer
@@ -45,7 +45,7 @@ class UsuarioViewSet(BaseModelViewSet):
     serializer_class = UsuarioListSerializer
     filterset_class = UsuarioFilterSet
     serializer_classes = {
-        'retrieve': UsuarioSerializer,
+        'retrieve': UsuarioGetSerializer,
         'create': UsuarioPostSerializer,
         'update': UsuarioPutPathSerializer,
         'partial_update': UsuarioPutPathSerializer,
@@ -148,7 +148,7 @@ class UsuarioViewSet(BaseModelViewSet):
         usuario.is_superuser = serializer.data.get('is_superuser')
         usuario.save()
 
-        serializer = UsuarioSerializer(usuario)
+        serializer = UsuarioGetSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -167,7 +167,7 @@ class UsuarioViewSet(BaseModelViewSet):
         usuario.is_manager = serializer.data.get('is_manager')
         usuario.save()
 
-        serializer = UsuarioSerializer(usuario)
+        serializer = UsuarioGetSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -190,7 +190,7 @@ class UsuarioViewSet(BaseModelViewSet):
         usuario.set_password(serializer.data.get('new_password'))
         usuario.save()
 
-        serializer = UsuarioSerializer(usuario)
+        serializer = UsuarioGetSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -206,7 +206,7 @@ class UsuarioViewSet(BaseModelViewSet):
         usuario.authentication_failures = 0
         usuario.save()
 
-        serializer = UsuarioSerializer(usuario)
+        serializer = UsuarioGetSerializer(usuario)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -250,23 +250,23 @@ class UsuarioEmpresaViewSet(
 
 class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
-    serializer_class = GrupoPermissoesUsuarioSerializer
+    serializer_class = GrupoPermissoesUsuarioGetSerializer
     permission_classes = (BasePemission, )
 
     serializer_classes = {
-        'retrieve': GrupoPermissoesUsuarioSerializerRetrieve,
-        'create': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
-        'update': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
-        'partial_update': GrupoPermissoesUsuarioSerializerCreateUpdatePartialUpadate,
+        'retrieve': GrupoPermissoesUsuarioRetrieveSerializer,
+        'create': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,
+        'update': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,
+        'partial_update': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,
     }
 
     def get_serializer_class(self):
-        return self.serializer_classes.get(self.action, GrupoPermissoesUsuarioSerializer)
+        return self.serializer_classes.get(self.action, GrupoPermissoesUsuarioGetSerializer)
 
 
 class PermissaoUsuarioViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Permission.objects.all()
-    serializer_class = PermissaoUsuarioSerializer
+    serializer_class = PermissaoUsuarioGetSerializer
     permission_classes = (BasePemission, )
 
 
