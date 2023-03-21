@@ -36,7 +36,7 @@ class EmpresaListSerializer(EmpresaGetSerializer):
 
 
 class EmpresaPostSerializer(EmpresaGetSerializer):
-    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.filter(ativo='S'), slug_field='id', required=False, allow_null=True)
 
     class Meta(EmpresaGetSerializer.Meta):
         read_only_fields = [field for field in EmpresaGetSerializer.Meta.read_only_fields if field not in [

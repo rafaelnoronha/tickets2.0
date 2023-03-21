@@ -26,7 +26,7 @@ from .serializers import (
     UsuarioPostSerializer, ObterParTokensSerializer, UsuarioRedefinirSenhaSerializer,
     UsuarioAlterarSenhaSerializer, UsuarioAtivarInativarSerializer,
     UsuarioTransformarAdminSerializer, UsuarioTransformarGerenteSerializer, GrupoPermissoesUsuarioGetSerializer,
-    GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer, GrupoPermissoesUsuarioRetrieveSerializer,
+    GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer, GrupoPermissoesUsuarioGetSerializer,
     PermissaoUsuarioGetSerializer, ClassificacaoUsuarioListSerializer, ClassificacaoUsuarioPostSerializer,
     ClassificacaoUsuarioGetSerializer, ClassificacaoUsuarioPutPatchSerializer, ClassificacaoUsuarioAtivarInativarSerializer,
     UsuarioEmpresaListSerializer, UsuarioEmpresaPostSerializer, UsuarioEmpresaGetSerializer,
@@ -254,7 +254,7 @@ class GrupoPermissoesUsuarioViewSet(viewsets.ModelViewSet):
     permission_classes = (BasePemission, )
 
     serializer_classes = {
-        'retrieve': GrupoPermissoesUsuarioRetrieveSerializer,
+        'retrieve': GrupoPermissoesUsuarioGetSerializer,
         'create': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,
         'update': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,
         'partial_update': GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer,

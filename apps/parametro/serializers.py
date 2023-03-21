@@ -7,7 +7,9 @@ from apps.empresa.models import Empresa
 from apps.core.serializers import BaseEmpresaSerializer
 
 
-class ParametroListSerializer(BaseSerializer):
+class ParametroGetSerializer(BaseSerializer):
+    empresa = BaseEmpresaSerializer()
+
     class Meta:
         model = Parametro
         fields = [
@@ -20,12 +22,12 @@ class ParametroListSerializer(BaseSerializer):
         read_only_fields = fields
 
 
-class ParametroGetSerializer(ParametroListSerializer):
-    empresa = BaseEmpresaSerializer()
+class ParametroListSerializer(ParametroGetSerializer):
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id')
 
 
-class ParametroPostSerializer(ParametroListSerializer):
-    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.all(), slug_field='id', required=False, allow_null=True)
+class ParametroPostSerializer(ParametroGetSerializer):
+    empresa = serializers.SlugRelatedField(queryset=Empresa.objects.filter(ativo='S'), slug_field='id', required=False, allow_null=True)
 
     class Meta(ParametroListSerializer.Meta):
         read_only_fields = [field for field in ParametroListSerializer.Meta.read_only_fields if field not in [
@@ -36,7 +38,7 @@ class ParametroPostSerializer(ParametroListSerializer):
         ]]
 
 
-class ParametroPutPatchSerializer(ParametroListSerializer):
+class ParametroPutPatchSerializer(ParametroGetSerializer):
     class Meta(ParametroListSerializer.Meta):
         read_only_fields = [field for field in ParametroListSerializer.Meta.read_only_fields if field not in [
             'pr_valor'
