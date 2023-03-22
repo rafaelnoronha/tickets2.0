@@ -42,3 +42,4 @@ class UsuarioEmpresaFilterSet(django_filters.FilterSet):
             'sm_usuario': ['exact'],
         }
         fields.update([(f'sm_usuario__{chave}', valor) for chave, valor in UsuarioFilterSet.Meta.fields.items()])
+        fields.update(lookup_types_base)
