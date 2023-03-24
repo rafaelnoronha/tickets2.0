@@ -1,9 +1,11 @@
 import django_filters
 
 from .models import Empresa
-from apps.core.filters import lookup_types_string, lookup_types_number, lookup_types_base
+from apps.core.filters import lookup_types_string, lookup_types_number
+from apps.core.decorators import fields_base_filter_set
 
 
+@fields_base_filter_set
 class EmpresaFilterSet(django_filters.FilterSet):
     class Meta:
         model = Empresa
@@ -23,4 +25,3 @@ class EmpresaFilterSet(django_filters.FilterSet):
             'mp_media_avaliacoes': lookup_types_number,
             'mp_prestadora_servico': lookup_types_string,
         }
-        fields.update(lookup_types_base)

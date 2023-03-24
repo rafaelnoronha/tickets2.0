@@ -1,9 +1,11 @@
 import django_filters
 
 from .models import Parametro
-from apps.core.filters import lookup_types_string, lookup_types_base
+from apps.core.filters import lookup_types_string
+from apps.core.decorators import fields_base_filter_set
 
 
+@fields_base_filter_set
 class ParametroFilterSet(django_filters.FilterSet):
     class Meta:
         model = Parametro
@@ -12,4 +14,3 @@ class ParametroFilterSet(django_filters.FilterSet):
             'pr_descricao': lookup_types_string,
             'pr_valor': lookup_types_string,
         }
-        fields.update(lookup_types_base)

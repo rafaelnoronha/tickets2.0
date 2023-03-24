@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
 from apps.auditoria.models import LogAutenticacao
 from apps.core.serializers import BaseSerializer
+from apps.core.decorators import fields_base_serializer
 from apps.empresa.models import Empresa
 from apps.empresa.serializers import BaseEmpresaSerializer
 
@@ -67,7 +68,8 @@ class GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer(GrupoPermissoes
         ]
 
 
-class ClassificacaoUsuarioGetSerializer(BaseSerializer):
+@fields_base_serializer
+class ClassificacaoUsuarioGetSerializer(serializers.ModelSerializer):
     empresa = BaseEmpresaSerializer()
 
     class Meta:
@@ -77,7 +79,6 @@ class ClassificacaoUsuarioGetSerializer(BaseSerializer):
             'cp_nome',
             'cp_descricao',
         ]
-        fields += BaseSerializer.Meta.fields
         read_only_fields = fields
 
 
@@ -286,7 +287,8 @@ class UsuarioAlterarSenhaSerializer(serializers.Serializer):
         ]
 
 
-class UsuarioEmpresaGetSerializer(BaseSerializer):
+@fields_base_serializer
+class UsuarioEmpresaGetSerializer(serializers.ModelSerializer):
     sm_usuario = UsuarioGetSerializer()
     empresa = BaseEmpresaSerializer()
 
@@ -295,7 +297,6 @@ class UsuarioEmpresaGetSerializer(BaseSerializer):
         fields = [
             'sm_usuario',
         ]
-        fields += BaseSerializer.Meta.fields
         read_only_fields = fields
 
 

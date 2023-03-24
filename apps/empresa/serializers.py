@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
 from .models import Empresa
-from apps.core.serializers import BaseSerializer
 from apps.core.serializers import BaseEmpresaSerializer
+from apps.core.decorators import fields_base_serializer
 
 
-class EmpresaGetSerializer(BaseSerializer):
+@fields_base_serializer
+class EmpresaGetSerializer(serializers.ModelSerializer):
     empresa = BaseEmpresaSerializer()
 
     class Meta:
@@ -27,7 +28,6 @@ class EmpresaGetSerializer(BaseSerializer):
             'mp_media_avaliacoes',
             'mp_prestadora_servico',
         ]
-        fields += BaseSerializer.Meta.fields
         read_only_fields = fields
 
 

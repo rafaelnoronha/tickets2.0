@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from .models import Parametro
-from apps.core.serializers import BaseSerializer
 from apps.usuario.models import Usuario
 from apps.empresa.models import Empresa
 from apps.core.serializers import BaseEmpresaSerializer
+from apps.core.decorators import fields_base_serializer
 
 
-class ParametroGetSerializer(BaseSerializer):
+@fields_base_serializer
+class ParametroGetSerializer(serializers.ModelSerializer):
     empresa = BaseEmpresaSerializer()
 
     class Meta:
@@ -18,7 +19,6 @@ class ParametroGetSerializer(BaseSerializer):
             'pr_descricao',
             'pr_valor',
         ]
-        fields += BaseSerializer.Meta.fields
         read_only_fields = fields
 
 

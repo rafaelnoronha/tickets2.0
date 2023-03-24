@@ -1,3 +1,6 @@
+from apps.core.serializers import BaseSerializer
+from apps.core.filters import lookup_types_base
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -30,5 +33,23 @@ def action_ativar_inativar(viewClass):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
         return View
+
+    return decorator()
+
+def fields_base_serializer(metaSerializerClass):
+    def decorator():
+        metaSerializerClass.Meta.fields += BaseSerializer.Meta.fields.copy()
+
+        return metaSerializerClass
+
+    return decorator()
+
+
+def fields_base_filter_set(metaFilterSetClass):
+    def decorator():
+        metaFilterSetClass.Meta.fields.update(lookup_types_base)
+        print(metaFilterSetClass.Meta.fields)
+
+        return metaFilterSetClass
 
     return decorator()

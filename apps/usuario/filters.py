@@ -1,9 +1,11 @@
 import django_filters
 
 from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
-from apps.core.filters import lookup_types_string, lookup_types_base, lookup_types_number
+from apps.core.filters import lookup_types_string, lookup_types_number
+from apps.core.decorators import fields_base_filter_set
 
 
+@fields_base_filter_set
 class ClassificacaoUsuarioFilterSet(django_filters.FilterSet):
     class Meta:
         model = ClassificacaoUsuario
@@ -12,7 +14,6 @@ class ClassificacaoUsuarioFilterSet(django_filters.FilterSet):
             'cs_nome': lookup_types_string,
             'cs_descricao': lookup_types_string,
         }
-        fields.update(lookup_types_base)
 
 
 class UsuarioFilterSet(django_filters.FilterSet):
@@ -35,6 +36,7 @@ class UsuarioFilterSet(django_filters.FilterSet):
         fields.update([(f'sr_classificacao__{chave}', valor) for chave, valor in ClassificacaoUsuarioFilterSet.Meta.fields.items()])
 
 
+@fields_base_filter_set
 class UsuarioEmpresaFilterSet(django_filters.FilterSet):
     class Meta:
         model = UsuarioEmpresa
@@ -42,4 +44,3 @@ class UsuarioEmpresaFilterSet(django_filters.FilterSet):
             'sm_usuario': ['exact'],
         }
         fields.update([(f'sm_usuario__{chave}', valor) for chave, valor in UsuarioFilterSet.Meta.fields.items()])
-        fields.update(lookup_types_base)
