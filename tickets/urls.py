@@ -25,6 +25,7 @@ from apps.usuario.urls import (
 from apps.auditoria.urls import log_authenticacao_router
 from apps.empresa.urls import empresa_router
 from apps.parametro.urls import parametro_router
+from apps.lgpd.urls import politica_privacidade_router, consentimento_politica_privacidade_router
 
 api_v1 = 'api/v1'
 
@@ -39,4 +40,6 @@ urlpatterns = [
     path(f"{api_v1}/classificacao-usuario/", include(classificacao_usuario_router.urls)),
     path(f"{api_v1}/usuario-empresa/", include(usuario_empresa_router.urls)),
     path(f"{api_v1}/empresa/", include(empresa_router.urls)),
+    path(f"{api_v1}/politica-privacidade/", include(politica_privacidade_router.urls)),
+    path(f"{api_v1}/consentimento-politica-privacidade/", include(consentimento_politica_privacidade_router.urls)),
 ]
