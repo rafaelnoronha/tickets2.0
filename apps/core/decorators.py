@@ -1,5 +1,8 @@
 from apps.core.serializers import BaseSerializer
 from apps.core.filters import lookup_types_base
+import django_filters
+from apps.parametro.models import Parametro
+from apps.core.filters import lookup_types_string
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -36,20 +39,25 @@ def action_ativar_inativar(viewClass):
 
     return decorator()
 
-def fields_base_serializer(metaSerializerClass):
-    def decorator():
-        metaSerializerClass.Meta.fields += BaseSerializer.Meta.fields.copy()
+def fields_base_serializer(serializerClass):
+    class SerializerClass(serializerClass):
+        class Meta(serializerClass.Meta):
+            fields = serializerClass.Meta.fields.copy()
+            fields += BaseSerializer.Meta.fields.copy()
 
-        return metaSerializerClass
+    def decorator():
+        return SerializerClass
 
     return decorator()
 
 
-def fields_base_filter_set(metaFilterSetClass):
-    def decorator():
-        metaFilterSetClass.Meta.fields.update(lookup_types_base)
-        print(metaFilterSetClass.Meta.fields)
+def fields_base_filter_set(filtersetClass):
+    class FilterSetClass(filtersetClass):
+        class Meta(filtersetClass.Meta):
+            fields = filtersetClass.Meta.fields
+            fields.update(lookup_types_base)
 
-        return metaFilterSetClass
+    def decorator():
+        return FilterSetClass
 
     return decorator()
