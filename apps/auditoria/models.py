@@ -35,9 +35,6 @@ class LogAutenticacao(Base):
         help_text='Se a tentativa de autenticação foi bem-sucedida ou não',
     )
 
-    ativo = None
-    empresa = None
-
 
     class Meta:
         db_table = 'tc_log_autenticacao'

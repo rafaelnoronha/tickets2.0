@@ -22,6 +22,7 @@ from apps.usuario.urls import (
     usuario_router, router_permissao_usuario, router_grupo_permissoes_usuario,
     classificacao_usuario_router, usuario_empresa_router
 )
+from apps.auditoria.urls import log_authenticacao_router
 from apps.empresa.urls import empresa_router
 from apps.parametro.urls import parametro_router
 
@@ -32,6 +33,7 @@ urlpatterns = [
     path(f"{api_v1}/refresh/", TokenRefreshView.as_view(), name='token_refresh'),
     path(f"{api_v1}/parametro/", include(parametro_router.urls)),
     path(f"{api_v1}/usuario/", include(usuario_router.urls)),
+    path(f"{api_v1}/log-autenticacao/", include(log_authenticacao_router.urls)),
     path(f"{api_v1}/grupo-permissao-usuario/", include(router_grupo_permissoes_usuario.urls)),
     path(f"{api_v1}/permissao-usuario/", include(router_permissao_usuario.urls)),
     path(f"{api_v1}/classificacao-usuario/", include(classificacao_usuario_router.urls)),

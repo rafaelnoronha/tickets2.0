@@ -32,30 +32,6 @@ class ClassificacaoUsuario(Base):
         help_text='Descrição da classificação',
     )
 
-    data_criacao = models.DateField(
-        verbose_name='Data de Criação',
-        auto_now_add=True,
-        help_text='Data da criação do registro'
-    )
-
-    hora_criacao = models.TimeField(
-        verbose_name='Hora de Criação',
-        auto_now_add=True,
-        help_text='Hora da criação do registro'
-    )
-
-    data_alteracao = models.DateField(
-        verbose_name='Data da Alteração',
-        auto_now=True,
-        help_text='Data da alteração do registro'
-    )
-
-    hora_alteracao = models.TimeField(
-        verbose_name='Hora da Alteração',
-        auto_now=True,
-        help_text='Hora da alteração do registro'
-    )
-
 
     class Meta:
         ordering = ['-id']
@@ -68,9 +44,6 @@ class ClassificacaoUsuario(Base):
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar a classificação de usuário'),
         )
-
-    def __str__(self):
-        return str(self.id)
 
 
 class UserManagerCustom(UserManager):
@@ -233,9 +206,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             ('ativar_inativar', 'Permite ativar ou inativar um perfil de usuário'),
         )
 
-    def __str__(self):
-        return str(self.id)
-
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
@@ -261,9 +231,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             ('transformar_gerente', 'Permite transformar um usuário em gerente'),
             ('classificar', 'Permite classificar um usuário'),
         )
-
-    def __str__(self):
-        return str(self.id)
     
 
 class UsuarioEmpresa(Base):
@@ -288,6 +255,3 @@ class UsuarioEmpresa(Base):
         permissions = (
             ('ativar_inativar', 'Permite ativar ou inativar o acesso de um usuário a uma empresa'),
         )
-
-    def __str__(self):
-        return str(self.id)

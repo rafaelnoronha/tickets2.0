@@ -11,7 +11,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Usuario, ClassificacaoUsuario, UsuarioEmpresa
 from apps.auditoria.models import LogAutenticacao
-from apps.core.serializers import BaseSerializer
 from apps.core.decorators import fields_base_serializer
 from apps.empresa.models import Empresa
 from apps.empresa.serializers import BaseEmpresaSerializer
@@ -75,9 +74,9 @@ class ClassificacaoUsuarioGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassificacaoUsuario
         fields = [
-            'cp_codigo',
-            'cp_nome',
-            'cp_descricao',
+            'cs_codigo',
+            'cs_nome',
+            'cs_descricao',
         ]
         read_only_fields = fields
 
@@ -91,9 +90,9 @@ class ClassificacaoUsuarioPostSerializer(ClassificacaoUsuarioGetSerializer):
 
     class Meta(ClassificacaoUsuarioGetSerializer.Meta):
         read_only_fields = [field for field in ClassificacaoUsuarioGetSerializer.Meta.read_only_fields if field not in [
-            'cp_codigo',
-            'cp_nome',
-            'cp_descricao',
+            'cs_codigo',
+            'cs_nome',
+            'cs_descricao',
             'empresa',
         ]]
 
@@ -103,8 +102,8 @@ class ClassificacaoUsuarioPutPatchSerializer(ClassificacaoUsuarioGetSerializer):
 
     class Meta(ClassificacaoUsuarioGetSerializer.Meta):
         read_only_fields = [field for field in ClassificacaoUsuarioGetSerializer.Meta.read_only_fields if field not in [
-            'cp_nome',
-            'cp_descricao',
+            'cs_nome',
+            'cs_descricao',
             'empresa',
         ]]
 
