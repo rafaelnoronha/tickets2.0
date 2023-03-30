@@ -67,6 +67,17 @@ class GrupoPermissoesUsuarioCreateUpdatePartialUpadateSerializer(GrupoPermissoes
         ]
 
 
+class ClassificacaoUsuarioMinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassificacaoUsuario
+        fields = [
+            'id',
+            'cs_codigo',
+            'cs_nome',
+        ]
+        read_only_fields = fields.copy()
+
+
 @fields_base_serializer
 class ClassificacaoUsuarioGetSerializer(serializers.ModelSerializer):
     empresa = BaseEmpresaSerializer()
@@ -74,6 +85,7 @@ class ClassificacaoUsuarioGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassificacaoUsuario
         fields = [
+            'id',
             'cs_codigo',
             'cs_nome',
             'cs_descricao',
@@ -113,8 +125,23 @@ class ClassificacaoUsuarioAtivarInativarSerializer(ClassificacaoUsuarioGetSerial
         read_only_fields = [field for field in ClassificacaoUsuarioGetSerializer.Meta.read_only_fields if field not in ['ativo',]]
 
 
+class UsuarioMinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = [
+            'id',
+            'username',
+            'email',
+            'sr_nome',
+            'sr_telefone',
+            'sr_celular',
+        ]
+        read_only_fields = fields.copy()
+
+
 class UsuarioGetSerializer(serializers.ModelSerializer):
     groups = GrupoPermissoesUsuarioGetSerializer(many=True)
+    sr_classificacao = ClassificacaoUsuarioListSerializer()
 
     def validate_password(self, password):
         validate_password(password)
@@ -149,6 +176,8 @@ class UsuarioGetSerializer(serializers.ModelSerializer):
 
 
 class UsuarioListSerializer(UsuarioGetSerializer):
+    sr_classificacao = ClassificacaoUsuarioMinSerializer()
+
     class Meta(UsuarioGetSerializer.Meta):
         fields = [
             'id',
@@ -294,6 +323,7 @@ class UsuarioEmpresaGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioEmpresa
         fields = [
+            'id',
             'sm_usuario',
         ]
         read_only_fields = fields
